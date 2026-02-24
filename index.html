@@ -158,4 +158,87 @@
             "BWTS": { title: "파워 스케쥴 선교 네비게이터", desc: "항공권, 재정 관리, 사역 타임테이블 등 선교의 뼈대를 오차 없이 완벽하게 세워 팀을 이끄는 보이지 않는 브레인.", img: 11 },
             "BWTA": { title: "선교지 만능 맥가이버", desc: "무더운 날 짐을 나르거나 식사를 챙기는 등, 선교 현장에서 발생하는 온갖 돌발적인 궂은일을 말없이 척척 해결하는 기둥.", img: 12 },
             "BLRS": { title: "비밀 중보기도 요원", desc: "기도 노트에 지체들의 이름을 빼곡히 적어두고, 치밀하고 구체적으로 영적 전쟁의 최후방을 지키는 기도의 용사.", img: 13 },
-            "BLRA": { title: "공동체 인간 핫팩", desc: "공동체 모임에서 어색해하거나 소외된 새가족 곁에 유연하게
+            "BLRA": { title: "공동체 인간 핫팩", desc: "공동체 모임에서 어색해하거나 소외된 새가족 곁에 유연하게 다가가, 조용히 말을 건네며 마음을 녹여주는 따뜻한 난로.", img: 14 },
+            "BLTS": { title: "디테일 깎는 장인", desc: "청년부 행사 때 PPT, 영상, 회계 등 가장 손이 많이 가고 티 안 나는 사역을 완벽하게 준비하는 보이지 않는 손.", img: 15 },
+            "BLTA": { title: "교회의 숨은 천사", desc: "일손이 부족하거나 펑크 난 자리가 생기면 제일 먼저 달려와 그 자리를 기꺼이 메워주는, 묵묵하지만 가장 든든한 동역자.", img: 16 }
+        };
+
+        let questions = [];
+        let currentIndex = 0;
+        let scores = { F: 0, B: 0, W: 0, L: 0, R: 0, T: 0, S: 0, A: 0 };
+        let history = [];
+
+        function shuffle(arr) { return arr.sort(() => Math.random() - 0.5); }
+
+        function startTest() {
+            questions = shuffle([...rawQuestions]);
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('question-screen').classList.remove('hidden');
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const q = questions[currentIndex];
+            const container = document.getElementById('question-container');
+            
+            container.classList.remove('question-fade');
+            void container.offsetWidth;
+            container.classList.add('question-fade');
+
+            document.getElementById('scenario-text').innerText = q.q;
+            document.getElementById('option-a').innerText = q.a;
+            document.getElementById('option-b').innerText = q.b;
+            document.getElementById('progress-text').innerText = `${currentIndex + 1} / 20`;
+            document.getElementById('progress-bar').style.width = `${((currentIndex + 1) / 20) * 100}%`;
+            
+            document.getElementById('prev-btn').style.visibility = currentIndex === 0 ? 'hidden' : 'visible';
+            window.scrollTo(0,0);
+        }
+
+        function handleAnswer(pts, side) {
+            if (document.activeElement) document.activeElement.blur();
+            const q = questions[currentIndex];
+            const type = side === 'left' ? q.left : q.right;
+            
+            scores[type] += pts;
+            history.push({ type, pts });
+
+            if (currentIndex < 19) {
+                currentIndex++;
+                setTimeout(showQuestion, 200);
+            } else {
+                showResult();
+            }
+        }
+
+        function goBack() {
+            if (currentIndex > 0) {
+                const last = history.pop();
+                scores[last.type] -= last.pts;
+                currentIndex--;
+                showQuestion();
+            }
+        }
+
+        function showResult() {
+            const mbti = (scores.F >= scores.B ? "F" : "B") + 
+                         (scores.W >= scores.L ? "W" : "L") + 
+                         (scores.R >= scores.T ? "R" : "T") + 
+                         (scores.S >= scores.A ? "S" : "A");
+
+            const resultData = results[mbti];
+            const imagePath = "./"; 
+            
+            document.getElementById('question-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.remove('hidden');
+            
+            document.getElementById('result-img').src = `${imagePath}${resultData.img}.PNG`;
+            document.getElementById('result-code').innerText = mbti;
+            document.getElementById('result-title').innerText = resultData.title;
+            document.getElementById('result-desc').innerText = resultData.desc;
+            
+            window.scrollTo(0,0);
+        }
+    </script>
+</body>
+</html>
