@@ -15,29 +15,24 @@
             -webkit-user-select: none;
             user-select: none;
         }
-        /* 척도 선택 버튼 스타일 */
-        .scale-btn {
-            width: 100%;
-            padding: 16px;
-            border-radius: 1rem;
-            background: white;
-            border: 2px solid #f1f5f9;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-weight: 700;
-            font-size: 14px;
-            color: #64748b;
+        /* 동그라미 버튼 스타일 */
+        .circle-btn { 
+            transition: all 0.2s; 
+            cursor: pointer; 
+            border: 2px solid #e2e8f0; 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            background: white; 
+            flex-shrink: 0; 
+            margin: 0 auto;
         }
-        .scale-btn:active {
-            transform: scale(0.98);
-            background-color: #eef2ff;
-            border-color: #c7d2fe;
-            color: #4f46e5;
-        }
-        /* 상단/하단 상황 박스 */
+        .circle-btn:active { transform: scale(0.9); background-color: #e0e7ff; border-color: #c7d2fe; }
+        .circle-lg { width: 56px; height: 56px; }
+        .circle-sm { width: 44px; height: 44px; }
+        
+        /* 상황 박스 */
         .scenario-box {
             padding: 18px;
             border-radius: 1.25rem;
@@ -66,7 +61,7 @@
         <div class="mb-6 px-2">
             <div class="flex justify-between text-[11px] text-gray-400 mb-2 font-bold uppercase tracking-widest">
                 <span id="progress-text">1 / 20</span>
-                <span class="text-indigo-500">Missionary Test</span>
+                <span class="text-indigo-500 font-black">Missionary Test</span>
             </div>
             <div class="w-full bg-gray-200 h-1 rounded-full overflow-hidden">
                 <div id="progress-bar" class="bg-indigo-500 h-full transition-all duration-300" style="width: 5%"></div>
@@ -79,16 +74,28 @@
                 <h2 id="scenario-text" class="text-xl font-extrabold text-gray-900 leading-snug">질문 제목</h2>
             </div>
 
-            <div class="flex flex-col gap-4">
+            <div class="flex flex-col gap-6">
                 <div class="scenario-box border-l-4 border-l-indigo-400">
                     <p id="option-a-text" class="text-center text-gray-800 font-bold text-[15px] leading-relaxed"></p>
                 </div>
 
-                <div class="flex flex-col gap-2 py-2">
-                    <button onclick="handleAnswer(2, 'left')" class="scale-btn">매우 그렇다</button>
-                    <button onclick="handleAnswer(1, 'left')" class="scale-btn text-sm font-medium">약간 그렇다</button>
-                    <button onclick="handleAnswer(1, 'right')" class="scale-btn text-sm font-medium">약간 그렇다</button>
-                    <button onclick="handleAnswer(2, 'right')" class="scale-btn">매우 그렇다</button>
+                <div class="flex flex-col gap-4 py-2">
+                    <button onclick="handleAnswer(2, 'left')" class="flex flex-col items-center gap-1 group">
+                        <div class="circle-btn circle-lg border-2 border-indigo-200 shadow-sm"></div>
+                        <span class="text-[10px] text-gray-400 font-bold">매우 그렇다</span>
+                    </button>
+                    <button onclick="handleAnswer(1, 'left')" class="flex flex-col items-center gap-1 group">
+                        <div class="circle-btn circle-sm border-gray-200 shadow-sm"></div>
+                        <span class="text-[10px] text-gray-400 font-bold">약간 그렇다</span>
+                    </button>
+                    <button onclick="handleAnswer(1, 'right')" class="flex flex-col items-center gap-1 group">
+                        <div class="circle-btn circle-sm border-gray-200 shadow-sm"></div>
+                        <span class="text-[10px] text-gray-400 font-bold">약간 그렇다</span>
+                    </button>
+                    <button onclick="handleAnswer(2, 'right')" class="flex flex-col items-center gap-1 group">
+                        <div class="circle-btn circle-lg border-2 border-indigo-200 shadow-sm"></div>
+                        <span class="text-[10px] text-gray-400 font-bold">매우 그렇다</span>
+                    </button>
                 </div>
 
                 <div class="scenario-box border-l-4 border-l-gray-300">
@@ -113,7 +120,7 @@
             <div class="flex justify-center mb-6">
                 <img id="result-img" src="" alt="Type Character" class="w-48 h-auto type-img-shadow">
             </div>
-            <div id="result-code" class="text-5xl font-black text-indigo-900 mb-2 italic">TYPE</div>
+            <div id="result-code" class="text-5xl font-black text-indigo-900 mb-2 italic tracking-tighter">TYPE</div>
             <h2 id="result-title" class="text-2xl font-bold text-gray-800 mb-8 break-keep px-4">유형 이름</h2>
             <div class="w-10 h-1 bg-indigo-500 mx-auto mb-10 rounded-full"></div>
             <p id="result-desc" class="text-[15px] text-gray-600 leading-[1.8] mb-12 text-left bg-gray-50 p-8 rounded-[2.5rem] border border-white shadow-inner whitespace-pre-wrap"></p>
@@ -129,7 +136,7 @@
             { q: "사역이나 아웃리치 현장에서,", a: "전체 기획을 하는 것이 편하다", b: "정해진 대로 실행하는 게 편하다", left: 'F', right: 'B' },
             { q: "새로운 기기나 유행에 대해,", a: "빨리 시도해보는 얼리어답터", b: "익숙한 것을 선호하는 안정형", left: 'F', right: 'B' },
             { q: "식당에서 메뉴를 고를 때,", a: "안 먹어본 새로운 특선 요리", b: "늘 먹던 실패 없는 단골 메뉴", left: 'W', right: 'L' },
-            { q: "서점에서 책을 고를 때,", a: "먼 나라의 역사나 세계 정세", b: "내 삶에 바로 적용할 실용서", left: 'W', right: 'L' },
+            { q: "서점이나 도서관에 갔을 때,", a: "먼 나라의 역사나 세계 정세", b: "내 삶에 바로 적용할 실용서", left: 'W', right: 'L' },
             { q: "진정한 '쉼'이 필요할 때,", a: "한 번도 안 가본 곳으로 여행", b: "익숙하고 편안한 내 방 침대", left: 'W', right: 'L' },
             { q: "더 눈물이 나는 기도는,", a: "미전도 종족을 향한 기도", b: "내 이웃과 동료를 향한 기도", left: 'W', right: 'L' },
             { q: "내 유튜브 알고리즘에는,", a: "해외여행이나 세계 테마 기행", b: "일상 브이로그나 핫플 정보", left: 'W', right: 'L' },
