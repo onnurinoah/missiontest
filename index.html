@@ -10,24 +10,40 @@
         body { 
             font-family: 'Pretendard', sans-serif; 
             background-color: #f8fafc; 
-            word-break: keep-all; 
-            overflow-wrap: break-word;
             touch-action: manipulation;
             -webkit-tap-highlight-color: transparent;
             -webkit-user-select: none;
             user-select: none;
         }
-        .circle-btn { transition: all 0.2s; cursor: pointer; border: 2px solid #e2e8f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: white; flex-shrink: 0; }
-        .circle-btn:active { transform: scale(0.9); background-color: #e0e7ff; }
-        .circle-lg { width: 52px; height: 52px; }
-        .circle-sm { width: 40px; height: 40px; }
-        
+        /* 버튼 공통 스타일 */
+        .option-btn {
+            width: 100%;
+            padding: 18px 20px;
+            border-radius: 1.25rem;
+            background: white;
+            border: 2px solid #f1f5f9;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            cursor: pointer;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        .option-btn:active {
+            transform: scale(0.97);
+            background-color: #eef2ff;
+            border-color: #c7d2fe;
+        }
+        /* 원형 인디케이터 */
+        .dot { border-radius: 50%; border: 2px solid #e2e8f0; flex-shrink: 0; }
+        .dot-lg { width: 24px; height: 24px; }
+        .dot-sm { width: 18px; height: 18px; }
+
         .question-fade { animation: qFade 0.4s ease-out; }
         @keyframes qFade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-
         .fade-in { animation: fadeIn 0.6s ease-out; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
         .type-img-shadow { filter: drop-shadow(0 10px 12px rgba(0, 0, 0, 0.15)); }
     </style>
 </head>
@@ -36,67 +52,60 @@
     <div id="start-screen" class="max-w-md w-full text-center fade-in">
         <div class="mb-6 text-6xl">🧬</div>
         <h1 class="text-3xl font-black text-gray-900 mb-4 tracking-tight">선교 적성 검사</h1>
-        <p class="text-gray-500 mb-8 leading-relaxed px-6 text-sm">
-            열방을 향한 나의 마음은 어떤 모습일까요?<br>
-            <span class="text-indigo-600 font-bold">20개의 상황 질문</span>을 통해 유형을 확인해보세요.
+        <p class="text-gray-500 mb-8 leading-relaxed px-6 text-sm italic">
+            "나의 선교적 DNA는 어떤 모습일까요?"
         </p>
         <button onclick="startTest()" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold text-lg hover:bg-indigo-700 shadow-xl transition-all active:scale-95">검사 시작하기</button>
     </div>
 
     <div id="question-screen" class="max-w-md w-full hidden">
         <div class="mb-6 px-2">
-            <div class="flex justify-between text-[10px] text-gray-400 mb-2 uppercase tracking-widest font-bold">
+            <div class="flex justify-between text-[11px] text-gray-400 mb-2 font-bold uppercase tracking-widest">
                 <span id="progress-text">1 / 20</span>
-                </div>
+                <span class="text-indigo-500">Missionary Test</span>
+            </div>
             <div class="w-full bg-gray-200 h-1 rounded-full overflow-hidden">
-                <div id="progress-bar" class="progress-bar bg-indigo-500 h-full transition-all duration-300" style="width: 5%"></div>
+                <div id="progress-bar" class="bg-indigo-500 h-full transition-all duration-300" style="width: 5%"></div>
             </div>
         </div>
 
-        <div id="question-container" class="bg-white rounded-[2.5rem] p-7 shadow-sm border border-gray-100 flex flex-col question-fade">
+        <div id="question-container" class="bg-white rounded-[2.5rem] p-7 shadow-sm border border-gray-100 question-fade">
             <div class="text-center mb-8">
-                <span class="inline-block bg-indigo-50 text-indigo-600 text-[12px] font-bold px-4 py-1.5 rounded-full mb-4 shadow-sm">만약에...</span>
+                <span class="inline-block bg-indigo-50 text-indigo-600 text-[12px] font-bold px-4 py-1.5 rounded-full mb-4">만약에...</span>
                 <h2 id="scenario-text" class="text-xl font-extrabold text-gray-900 leading-snug px-2">상황 질문</h2>
             </div>
 
-            <div class="space-y-5">
-                <div class="bg-gray-50/70 rounded-3xl p-5 border border-gray-100 shadow-sm">
-                    <p id="option-a" class="text-center text-gray-800 font-bold text-[16px] mb-5 leading-relaxed px-2">선택지 A</p>
-                    <div class="flex justify-center items-end gap-8">
-                        <button onclick="handleAnswer(2, 'left')" class="flex flex-col items-center gap-2 group">
-                            <div class="circle-btn circle-lg border-2 border-indigo-200 shadow-sm"></div>
-                            <span class="text-[11px] text-gray-500 font-bold">매우 그렇다</span>
-                        </button>
-                        <button onclick="handleAnswer(1, 'left')" class="flex flex-col items-center gap-2 group">
-                            <div class="circle-btn circle-sm border-gray-200 shadow-sm mb-1"></div>
-                            <span class="text-[11px] text-gray-500 font-bold">약간 그렇다</span>
-                        </button>
-                    </div>
+            <div class="space-y-3">
+                <button onclick="handleAnswer(2, 'left')" class="option-btn">
+                    <div class="dot dot-lg border-indigo-400"></div>
+                    <span id="option-a-heavy" class="text-[14px] font-bold text-gray-700 text-left flex-1">A 내용 (매우 그렇다)</span>
+                </button>
+                <button onclick="handleAnswer(1, 'left')" class="option-btn">
+                    <div class="dot dot-sm"></div>
+                    <span id="option-a-light" class="text-[14px] font-semibold text-gray-600 text-left flex-1">A 내용 (약간 그렇다)</span>
+                </button>
+
+                <div class="py-2 flex items-center justify-center">
+                    <div class="w-8 h-[1px] bg-gray-100"></div>
                 </div>
 
-                <div class="bg-gray-50/70 rounded-3xl p-5 border border-gray-100 shadow-sm">
-                    <p id="option-b" class="text-center text-gray-800 font-bold text-[16px] mb-5 leading-relaxed px-2">선택지 B</p>
-                    <div class="flex justify-center items-end gap-8">
-                        <button onclick="handleAnswer(1, 'right')" class="flex flex-col items-center gap-2 group">
-                            <div class="circle-btn circle-sm border-gray-200 shadow-sm mb-1"></div>
-                            <span class="text-[11px] text-gray-500 font-bold">약간 그렇다</span>
-                        </button>
-                        <button onclick="handleAnswer(2, 'right')" class="flex flex-col items-center gap-2 group">
-                            <div class="circle-btn circle-lg border-2 border-indigo-200 shadow-sm"></div>
-                            <span class="text-[11px] text-gray-500 font-bold">매우 그렇다</span>
-                        </button>
-                    </div>
-                </div>
+                <button onclick="handleAnswer(1, 'right')" class="option-btn">
+                    <div class="dot dot-sm"></div>
+                    <span id="option-b-light" class="text-[14px] font-semibold text-gray-600 text-left flex-1">B 내용 (약간 그렇다)</span>
+                </button>
+                <button onclick="handleAnswer(2, 'right')" class="option-btn">
+                    <div class="dot dot-lg border-indigo-400"></div>
+                    <span id="option-b-heavy" class="text-[14px] font-bold text-gray-700 text-left flex-1">B 내용 (매우 그렇다)</span>
+                </button>
             </div>
 
-            <div class="flex justify-between items-center mt-10 pt-4 border-t border-gray-50">
-                <button id="prev-btn" onclick="goBack()" class="text-gray-400 hover:text-indigo-600 flex items-center gap-1 transition-all text-xs font-bold">
+            <div class="flex justify-start mt-8 pt-4 border-t border-gray-50">
+                <button id="prev-btn" onclick="goBack()" class="text-gray-400 hover:text-indigo-600 flex items-center gap-1 text-xs font-bold">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
                     </svg>
                     PREV
                 </button>
-                <span class="text-[9px] text-gray-300 font-black tracking-widest uppercase">Missionary Test</span>
             </div>
         </div>
     </div>
@@ -104,44 +113,39 @@
     <div id="result-screen" class="max-w-md w-full hidden fade-in">
         <div class="bg-white rounded-[3rem] p-8 shadow-2xl border border-indigo-50 text-center">
             <h3 class="text-indigo-500 font-bold mb-6 uppercase tracking-[0.3em] text-[10px]">Your Mission Type</h3>
-            
             <div class="flex justify-center mb-6">
                 <img id="result-img" src="" alt="Type Character" class="w-48 h-auto type-img-shadow">
             </div>
-
-            <div id="result-code" class="text-5xl font-black text-indigo-900 mb-2 tracking-tighter italic">TYPE</div>
+            <div id="result-code" class="text-5xl font-black text-indigo-900 mb-2 italic">TYPE</div>
             <h2 id="result-title" class="text-2xl font-bold text-gray-800 mb-8 break-keep px-4">유형 이름</h2>
-            
             <div class="w-10 h-1 bg-indigo-500 mx-auto mb-10 rounded-full"></div>
-            
             <p id="result-desc" class="text-[15px] text-gray-600 leading-[1.8] mb-12 text-left bg-gray-50 p-8 rounded-[2.5rem] border border-white shadow-inner whitespace-pre-wrap"></p>
-            
-            <button onclick="location.reload()" class="w-full bg-indigo-600 text-white py-5 rounded-2xl font-bold hover:bg-indigo-700 transition-all shadow-lg active:scale-95">테스트 다시하기</button>
+            <button onclick="location.reload()" class="w-full bg-indigo-600 text-white py-5 rounded-2xl font-bold hover:bg-indigo-700 shadow-lg active:scale-95">다시 테스트하기</button>
         </div>
     </div>
 
     <script>
         const rawQuestions = [
-            { q: "모임에 어색한 정적이 흐를 때,", a: "내가 먼저 아무 말이나 던져 침묵을 깬다.", b: "누군가 말할 때까지 속으로 기다린다.", left: 'F', right: 'B' },
-            { q: "지인과 함께 식사를 하러갈 때,", a: "먼저 물컵과 수저를 세팅한다.", b: "조심히 상황을 지켜보며 기다린다.", left: 'F', right: 'B' },
-            { q: "팀 프로젝트를 진행할 때,", a: "마이크를 잡고 스피치 하는 발표자", b: "타이밍 맞춰 PPT를 넘겨주는 오퍼레이터", left: 'F', right: 'B' },
-            { q: "사역의 자리나 아웃리치에서,", a: "기획을 하는 것이 마음이 편하다.", b: "기획된 대로 움직이는 것이 편하다.", left: 'F', right: 'B' },
-            { q: "전자기기나 유행에 대해서,", a: "늘 새로운 것을 시도하는 얼리어답터", b: "늘 익숙한 것을 추구하는 안정형", left: 'F', right: 'B' },
-            { q: "식당에서 메뉴를 고를 때,", a: "\"안 먹어본 오늘의 특선!\" 낯선 맛에 도전한다.", b: "\"늘 먹던 실패 없는 그 맛!\" 단골 메뉴를 시킨다.", left: 'W', right: 'L' },
-            { q: "서점에 가서 베스트셀러 코너를 볼 때,", a: "지구 반대편의 역사나 세계 정세 책에 손이 간다.", b: "내 삶에 바로 적용할 수 있는 실용서에 손이 간다.", left: 'W', right: 'L' },
-            { q: "나에게 진짜 '쉼'이 필요할 때,", a: "비행기를 타고 한 번도 안 가본 곳으로 떠난다.", b: "가장 익숙한 내 방 침대에서 OTT를 본다.", left: 'W', right: 'L' },
-            { q: "나에게 조금 더 와닿고 눈물이 나는 기도는,", a: "이름 모를 미전도 종족과 선교사님을 향한 기도", b: "나의 가족과 직장 동료, 내 옆자리 지체를 위한 기도", left: 'W', right: 'L' },
-            { q: "나의 유튜브 알고리즘에는,", a: "해외여행 브이로그, 걸어서 세계속으로 등", b: "국내 핫플 리뷰, 일상 브이로그, 자기계발 등", left: 'W', right: 'L' },
-            { q: "함께 일하던 팀원이 큰 실수를 했을 때,", a: "\"괜찮아? 많이 당황했지?\" 마음부터 챙긴다.", b: "\"어떻게 수습할지 플랜부터 짜자.\" 해결책부터 챙긴다.", left: 'R', right: 'T' },
-            { q: "모임에 지각해서 문을 열고 들어갈 때,", a: "\"다들 정말 미안해! 많이 기다렸지?\"", b: "\"지금 모임 어디까지 진행됐어?\"", left: 'R', right: 'T' },
-            { q: "함께 일할 파트너를 고를 때,", a: "성격이 원만하고 소통 방식이 잘 맞는 사람", b: "일 처리 능력이 확실하고 자기 몫을 다하는 사람", left: 'R', right: 'T' },
-            { q: "누군가에게 문제가 생겼을 때,", a: "조용히 옆에 앉아 끄덕이며 이야기를 들어준다.", b: "그 사람의 문제를 실질적으로 해결할 방법을 찾는다.", left: 'R', right: 'T' },
-            { q: "누군가에게 줄 선물을 준비할 때,", a: "이 선물을 받고 감동할 지인의 표정을 떠올린다.", b: "지인에게 지금 가장 실질적인 도움이 될 물건을 찾는다.", left: 'R', right: 'T' },
-            { q: "공동체 수련회나 아웃리치 짐을 쌀 때,", a: "\"혹시 모르니까\" 며칠 전부터 완벽하게 세팅한다.", b: "\"가서 사면 되지\" 출발 전날 눈에 보이는 대로 챙긴다.", left: 'S', right: 'A' },
-            { q: "가기로 한 식당이 하필 오늘 휴무일일 때,", a: "'왜 미리 검색을 안 했을까' 극심한 스트레스를 받는다.", b: "'오, 다른 맛집을 찾을 기회네!' 오히려 설렌다.", left: 'S', right: 'A' },
-            { q: "어떤 목적지를 찾아 갈 때,", a: "도착 예정 시간과 최적의 경로를 철저히 따른다.", b: "가끔은 내비게이션을 끄고 낯선 골목을 걸어본다.", left: 'S', right: 'A' },
-            { q: "내 스마트폰 캘린더의 상태는,", a: "시간 단위로 할 일과 미팅이 빼곡하게 적혀 있다.", b: "굵직한 약속만 적혀 있고 여백이 훨씬 많다.", left: 'S', right: 'A' },
-            { q: "마감일이 정해진 사역이나 업무를 할 때,", a: "미리미리 끝내놔야 마음 편히 발 뻗고 잔다.", b: "마감 직전 폭발하는 아드레날린의 효율을 믿는다.", left: 'S', right: 'A' }
+            { q: "모임에 어색한 정적이 흐를 때,", a: "먼저 말을 던져 침묵을 깬다", b: "누군가 말할 때까지 기다린다", left: 'F', right: 'B' },
+            { q: "지인과 식사하러 갔을 때,", a: "먼저 물컵과 수저를 세팅한다", b: "조용히 상황을 지켜본다", left: 'F', right: 'B' },
+            { q: "팀 프로젝트를 할 때 내 역할은,", a: "앞에서 발표하는 발표자", b: "뒤에서 지원하는 오퍼레이터", left: 'F', right: 'B' },
+            { q: "사역이나 아웃리치 현장에서,", a: "전체 기획을 하는 것이 편하다", b: "정해진 대로 실행하는 게 편하다", left: 'F', right: 'B' },
+            { q: "새로운 기기나 유행에 대해,", a: "빨리 시도해보는 얼리어답터", b: "익숙한 것을 선호하는 안정형", left: 'F', right: 'B' },
+            { q: "식당에서 메뉴를 고를 때,", a: "안 먹어본 새로운 특선 요리", b: "늘 먹던 실패 없는 단골 메뉴", left: 'W', right: 'L' },
+            { q: "서점에서 책을 고를 때,", a: "먼 나라의 역사나 세계 정세", b: "내 삶에 바로 적용할 실용서", left: 'W', right: 'L' },
+            { q: "진정한 '쉼'이 필요할 때,", a: "한 번도 안 가본 곳으로 여행", b: "익숙하고 편안한 내 방 침대", left: 'W', right: 'L' },
+            { q: "더 눈물이 나는 기도는,", a: "미전도 종족을 향한 기도", b: "내 이웃과 동료를 향한 기도", left: 'W', right: 'L' },
+            { q: "내 유튜브 알고리즘에는,", a: "해외여행이나 세계 테마 기행", b: "일상 브이로그나 핫플 정보", left: 'W', right: 'L' },
+            { q: "팀원이 큰 실수를 했을 때,", a: "\"괜찮아?\" 마음부터 챙긴다", b: "\"수습하자!\" 해결책부터 찾는다", left: 'R', right: 'T' },
+            { q: "모임에 지각했을 때 나는,", a: "미안한 마음에 사과부터 한다", b: "어디까지 진행됐는지 묻는다", left: 'R', right: 'T' },
+            { q: "함께 일할 파트너를 고를 때,", a: "성격과 소통이 잘 맞는 사람", b: "일 처리가 확실한 실력 있는 사람", left: 'R', right: 'T' },
+            { q: "누군가 고민을 털어놓을 때,", a: "조용히 끝까지 들어준다", b: "실질적인 해결 방법을 찾아준다", left: 'R', right: 'T' },
+            { q: "지인에게 선물을 준비할 때,", a: "상대의 감동할 표정을 생각한다", b: "상대에게 꼭 필요한 것을 찾는다", left: 'R', right: 'T' },
+            { q: "아웃리치 짐을 쌀 때 나는,", a: "며칠 전부터 완벽하게 체크한다", b: "전날 밤 눈에 보이는 대로 싼다", left: 'S', right: 'A' },
+            { q: "가려던 맛집이 하필 휴무라면,", a: "미리 안 알아본 사실에 스트레스", b: "다른 곳을 발견할 기회라 설렘", left: 'S', right: 'A' },
+            { q: "목적지를 찾아갈 때 나는,", a: "최단 경로 내비만 따라간다", b: "가끔 골목길로 돌아가 보기도 한다", left: 'S', right: 'A' },
+            { q: "내 스마트폰 캘린더에는,", a: "시간 단위로 일정이 꽉 차 있다", b: "굵직한 약속 외에는 여백이 많다", left: 'S', right: 'A' },
+            { q: "마감일이 정해진 일을 할 때,", a: "미리 끝내놔야 마음이 편하다", b: "마감 직전 초인적인 힘을 믿는다", left: 'S', right: 'A' }
         ];
 
         const results = {
@@ -180,26 +184,25 @@
         function showQuestion() {
             const q = questions[currentIndex];
             const container = document.getElementById('question-container');
-            
             container.classList.remove('question-fade');
             void container.offsetWidth;
             container.classList.add('question-fade');
 
             document.getElementById('scenario-text').innerText = q.q;
-            document.getElementById('option-a').innerText = q.a;
-            document.getElementById('option-b').innerText = q.b;
+            document.getElementById('option-a-heavy').innerText = q.a + " (매우 그렇다)";
+            document.getElementById('option-a-light').innerText = q.a + " (약간 그렇다)";
+            document.getElementById('option-b-light').innerText = q.b + " (약간 그렇다)";
+            document.getElementById('option-b-heavy').innerText = q.b + " (매우 그렇다)";
+
             document.getElementById('progress-text').innerText = `${currentIndex + 1} / 20`;
             document.getElementById('progress-bar').style.width = `${((currentIndex + 1) / 20) * 100}%`;
-            
             document.getElementById('prev-btn').style.visibility = currentIndex === 0 ? 'hidden' : 'visible';
             window.scrollTo(0,0);
         }
 
         function handleAnswer(pts, side) {
-            if (document.activeElement) document.activeElement.blur();
             const q = questions[currentIndex];
             const type = side === 'left' ? q.left : q.right;
-            
             scores[type] += pts;
             history.push({ type, pts });
 
@@ -228,15 +231,12 @@
 
             const resultData = results[mbti];
             const imagePath = "./"; 
-            
             document.getElementById('question-screen').classList.add('hidden');
             document.getElementById('result-screen').classList.remove('hidden');
-            
             document.getElementById('result-img').src = `${imagePath}${resultData.img}.PNG`;
             document.getElementById('result-code').innerText = mbti;
             document.getElementById('result-title').innerText = resultData.title;
             document.getElementById('result-desc').innerText = resultData.desc;
-            
             window.scrollTo(0,0);
         }
     </script>
