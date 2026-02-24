@@ -12,130 +12,131 @@
             background-color: #f8fafc; 
             word-break: keep-all; 
             overflow-wrap: break-word;
-            -webkit-tap-highlight-color: transparent; /* 모바일 터치 잔상 제거 */
+            -webkit-tap-highlight-color: transparent;
         }
         .circle-btn { transition: all 0.2s; cursor: pointer; border: 2px solid #e2e8f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: white; flex-shrink: 0; }
-        
-        /* 버튼 클릭 시 시각적 피드백만 주고 잔상은 남기지 않음 */
         .circle-btn:active { transform: scale(0.9); background-color: #e0e7ff; }
+        .circle-lg { width: 52px; height: 52px; }
+        .circle-sm { width: 40px; height: 40px; }
         
-        .circle-lg { width: 56px; height: 56px; }
-        .circle-sm { width: 44px; height: 44px; }
-        
-        .progress-bar { transition: width 0.3s ease-in-out; }
-
-        /* 문제 전환 애니메이션 */
         .question-fade { animation: qFade 0.4s ease-out; }
-        @keyframes qFade {
-            from { opacity: 0; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes qFade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
         .fade-in { animation: fadeIn 0.6s ease-out; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        
-        .option-box { min-height: 60px; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-4">
 
     <div id="start-screen" class="max-w-md w-full text-center fade-in">
-        <div class="mb-8 text-6xl">🧬</div>
-        <h1 class="text-3xl font-bold text-gray-800 mb-4 tracking-tight">선교 적성 검사</h1>
-        <p class="text-gray-500 mb-8 leading-relaxed px-4 text-sm">나의 선교적 성향은 무엇일까요?<br>20개의 문항을 통해 사역 유형을 확인해보세요.</p>
-        <button onclick="startTest()" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-semibold text-lg hover:bg-indigo-700 shadow-lg transition-all active:scale-95">테스트 시작하기</button>
+        <div class="mb-6 text-6xl">🧬</div>
+        <h1 class="text-3xl font-black text-gray-900 mb-4 tracking-tight">선교 적성 검사</h1>
+        <p class="text-gray-500 mb-8 leading-relaxed px-6 text-sm">
+            열방을 향한 나의 마음은 어떤 모습일까요?<br>
+            <span class="text-indigo-600 font-bold">20개의 상황 질문</span>을 통해 유형을 확인해보세요.
+        </p>
+        <button onclick="startTest()" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold text-lg hover:bg-indigo-700 shadow-xl transition-all active:scale-95">검사 시작하기</button>
     </div>
 
     <div id="question-screen" class="max-w-md w-full hidden">
         <div class="mb-6 px-2">
-            <div class="flex justify-between text-[10px] text-gray-400 mb-2 uppercase tracking-widest">
+            <div class="flex justify-between text-[10px] text-gray-400 mb-2 uppercase tracking-widest font-bold">
                 <span id="progress-text">1 / 20</span>
-                <span id="indicator-name" class="font-bold text-indigo-500">ANALYZING...</span>
+                <span id="indicator-name" class="text-indigo-500 italic">Position</span>
             </div>
             <div class="w-full bg-gray-200 h-1 rounded-full overflow-hidden">
-                <div id="progress-bar" class="progress-bar bg-indigo-500 h-full" style="width: 5%"></div>
+                <div id="progress-bar" class="progress-bar bg-indigo-500 h-full transition-all duration-300" style="width: 5%"></div>
             </div>
         </div>
 
-        <div id="question-container" class="bg-white rounded-[2.5rem] p-8 shadow-sm border border-gray-100 flex flex-col question-fade">
-            <div class="text-center mb-8">
-                <div id="option-a" class="option-box text-lg text-gray-800 font-bold px-2 mb-6">질문 A</div>
-                
-                <div class="flex flex-col items-center gap-4 mb-8">
-                    <button onclick="handleAnswer(2, 'left')" class="answer-btn flex items-center gap-4 w-full p-4 rounded-2xl border border-gray-50 hover:bg-indigo-50/50 group transition-all">
-                        <div class="circle-btn circle-lg shadow-sm border-2 border-indigo-100"></div>
-                        <span class="text-gray-600 font-medium group-hover:text-indigo-600 text-left text-sm">완전 나야! (매우 그렇다)</span>
-                    </button>
-                    <button onclick="handleAnswer(1, 'left')" class="answer-btn flex items-center gap-4 w-full p-3 rounded-2xl border border-gray-50 hover:bg-indigo-50/50 group transition-all">
-                        <div class="circle-btn circle-sm shadow-sm ml-1.5 border border-gray-200"></div>
-                        <span class="text-gray-500 text-xs group-hover:text-indigo-500 text-left">그런 편이야 (약간 그렇다)</span>
-                    </button>
-                    
-                    <div class="w-full border-t border-dashed border-gray-100 my-2"></div>
-
-                    <button onclick="handleAnswer(1, 'right')" class="answer-btn flex items-center gap-4 w-full p-3 rounded-2xl border border-gray-50 hover:bg-indigo-50/50 group transition-all">
-                        <div class="circle-btn circle-sm shadow-sm ml-1.5 border border-gray-200"></div>
-                        <span class="text-gray-500 text-xs group-hover:text-indigo-500 text-left">오히려 이쪽 (약간 그렇다)</span>
-                    </button>
-                    <button onclick="handleAnswer(2, 'right')" class="answer-btn flex items-center gap-4 w-full p-4 rounded-2xl border border-gray-50 hover:bg-indigo-50/50 group transition-all">
-                        <div class="circle-btn circle-lg shadow-sm border-2 border-indigo-100"></div>
-                        <span class="text-gray-600 font-medium group-hover:text-indigo-600 text-left text-sm">이게 나지! (매우 그렇다)</span>
-                    </button>
-                </div>
-
-                <div id="option-b" class="option-box text-lg text-gray-800 font-bold px-2">질문 B</div>
+        <div id="question-container" class="bg-white rounded-[2.5rem] p-7 shadow-sm border border-gray-100 flex flex-col question-fade">
+            <div class="text-center mb-6">
+                <span class="inline-block bg-indigo-50 text-indigo-600 text-[11px] font-bold px-3 py-1 rounded-full mb-3 uppercase tracking-tighter">Scenario</span>
+                <h2 id="scenario-text" class="text-xl font-extrabold text-gray-900 leading-snug px-2 italic">상황 질문이 들어가는 자리입니다.</h2>
             </div>
 
-            <div class="flex justify-between items-center pt-2">
-                <button id="prev-btn" onclick="goBack()" class="text-gray-400 hover:text-indigo-600 flex items-center gap-1 transition-all text-xs font-medium">
+            <div class="space-y-4">
+                <div class="bg-gray-50/50 rounded-2xl p-4 border border-gray-50">
+                    <p id="option-a" class="text-center text-gray-700 font-semibold text-[15px] mb-4">선택지 A</p>
+                    <div class="flex justify-center gap-6">
+                        <button onclick="handleAnswer(2, 'left')" class="flex flex-col items-center gap-1 group">
+                            <div class="circle-btn circle-lg border-2 border-indigo-200 shadow-sm"></div>
+                            <span class="text-[10px] text-gray-400 font-bold group-active:text-indigo-600">매우 그렇다</span>
+                        </button>
+                        <button onclick="handleAnswer(1, 'left')" class="flex flex-col items-center gap-1 group">
+                            <div class="circle-btn circle-sm border-gray-200 shadow-sm mt-1.5"></div>
+                            <span class="text-[10px] text-gray-400 font-bold group-active:text-indigo-600">약간 그렇다</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50/50 rounded-2xl p-4 border border-gray-50">
+                    <div class="flex justify-center gap-6 mb-4">
+                        <button onclick="handleAnswer(1, 'right')" class="flex flex-col items-center gap-1 group">
+                            <div class="circle-btn circle-sm border-gray-200 shadow-sm mb-1.5"></div>
+                            <span class="text-[10px] text-gray-400 font-bold group-active:text-indigo-600">약간 그렇다</span>
+                        </button>
+                        <button onclick="handleAnswer(2, 'right')" class="flex flex-col items-center gap-1 group">
+                            <div class="circle-btn circle-lg border-2 border-indigo-200 shadow-sm"></div>
+                            <span class="text-[10px] text-gray-400 font-bold group-active:text-indigo-600">매우 그렇다</span>
+                        </button>
+                    </div>
+                    <p id="option-b" class="text-center text-gray-700 font-semibold text-[15px]">선택지 B</p>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center mt-8 pt-2 border-t border-gray-50">
+                <button id="prev-btn" onclick="goBack()" class="text-gray-400 hover:text-indigo-600 flex items-center gap-1 transition-all text-xs font-bold">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
                     </svg>
-                    이전 질문
+                    PREV
                 </button>
-                <span class="text-[9px] text-gray-300 uppercase tracking-widest font-bold">Mission MBTI</span>
+                <span class="text-[9px] text-gray-300 font-black tracking-widest">MISSION APTITUDE TEST</span>
             </div>
         </div>
     </div>
 
-    <div id="result-screen" class="max-w-md w-full hidden fade-in px-2">
+    <div id="result-screen" class="max-w-md w-full hidden fade-in">
         <div class="bg-white rounded-[3rem] p-10 shadow-2xl border border-indigo-50 text-center">
-            <h3 class="text-indigo-500 font-bold mb-8 uppercase tracking-[0.3em] text-[10px]">Test Result</h3>
-            
+            <h3 class="text-indigo-500 font-bold mb-8 uppercase tracking-[0.3em] text-[10px]">Your Mission Type</h3>
             <div id="result-code" class="text-7xl font-black text-indigo-900 mb-4 tracking-tighter italic">TYPE</div>
-            <h2 id="result-title" class="text-2xl font-bold text-gray-800 mb-8 px-4">결과 유형 이름</h2>
-            
+            <h2 id="result-title" class="text-2xl font-bold text-gray-800 mb-8 break-keep">유형 이름</h2>
             <div class="w-10 h-1 bg-indigo-500 mx-auto mb-10 rounded-full"></div>
-            
-            <p id="result-desc" class="text-[15px] text-gray-600 leading-[1.7] mb-12 text-left bg-gray-50 p-8 rounded-[2rem] shadow-inner border border-white">결과 설명이 들어갑니다.</p>
-            
-            <button onclick="location.reload()" class="w-full bg-indigo-600 text-white py-5 rounded-2xl font-bold hover:bg-indigo-700 transition-all shadow-lg active:scale-95">다시 테스트하기</button>
+            <p id="result-desc" class="text-[15px] text-gray-600 leading-[1.8] mb-12 text-left bg-gray-50 p-8 rounded-[2.5rem] border border-white shadow-inner whitespace-pre-wrap"></p>
+            <button onclick="location.reload()" class="w-full bg-indigo-600 text-white py-5 rounded-2xl font-bold hover:bg-indigo-700 transition-all shadow-lg active:scale-95">테스트 다시하기</button>
         </div>
     </div>
 
     <script>
-        // 질문 데이터 (내용 동일)
         const rawQuestions = [
-            { type: 'FB', a: "내가 먼저 아무 말이나 던져 침묵을 깬다.", b: "누군가 말할 때까지 속으로 기다린다.", left: 'F', right: 'B' },
-            { type: 'FB', a: "먼저 물컵과 수저를 세팅한다.", b: "조심히 상황을 지켜보며 기다린다.", left: 'F', right: 'B' },
-            { type: 'FB', a: "마이크를 잡고 스피치 하는 발표자", b: "타이밍 맞춰 PPT를 넘겨주는 오퍼레이터", left: 'F', right: 'B' },
-            { type: 'FB', a: "기획을 하는 것이 마음이 편하다.", b: "기획된 대로 움직이는 것이 편하다.", left: 'F', right: 'B' },
-            { type: 'FB', a: "늘 새로운 것을 시도하는 얼리어답터", b: "늘 익숙한 것을 추구하는 안정형", left: 'F', right: 'B' },
-            { type: 'WL', a: "'안 먹어본 오늘의 특선!' 낯선 맛에 도전한다.", b: "'늘 먹던 실패 없는 그 맛!' 단골 메뉴를 시킨다.", left: 'W', right: 'L' },
-            { type: 'WL', a: "지구 반대편의 역사나 세계 정세에 관한 책에 손이 간다.", b: "내 삶에 바로 적용할 수 있는 에세이나 실용서에 손이 간다.", left: 'W', right: 'L' },
-            { type: 'WL', a: "비행기를 타고 한 번도 안 가본 곳으로 떠난다.", b: "익숙한 내 방 침대에서 좋아하는 OTT를 본다.", left: 'W', right: 'L' },
-            { type: 'WL', a: "이름 모를 미전도 종족과 선교사님을 향한 기도", b: "나의 가족과 직장 동료, 내 옆자리 지체를 위한 기도", left: 'W', right: 'L' },
-            { type: 'WL', a: "해외여행 브이로그, 걸어서 세계속으로 채널", b: "국내 핫플 리뷰, 일상 브이로그, 자기계발 채널", left: 'W', right: 'L' },
-            { type: 'RT', a: "'괜찮아? 많이 당황했지?' 마음부터 챙긴다.", b: "'어떻게 수습할지 플랜부터 짜자.' 해결책부터 챙긴다.", left: 'R', right: 'T' },
-            { type: 'RT', a: "'다들 정말 미안해! 많이 기다렸지?'", b: "'지금 모임 어디까지 진행됐어?'", left: 'R', right: 'T' },
-            { type: 'RT', a: "성격이 원만하고 소통 방식이 잘 맞는 사람", b: "일 처리 능력이 확실하고 자기 몫을 다하는 사람", left: 'R', right: 'T' },
-            { type: 'RT', a: "조용히 옆에 앉아 끄덕이며 끝까지 이야기를 들어준다.", b: "그 사람의 문제를 실질적으로 해결할 방법을 찾아준다.", left: 'R', right: 'T' },
-            { type: 'RT', a: "이 선물을 받고 감동할 지인의 표정을 떠올린다.", b: "지인에게 지금 가장 실질적인 도움이 될 물건을 찾는다.", left: 'R', right: 'T' },
-            { type: 'SA', a: "'혹시 모르니까' 며칠 전부터 완벽하게 다 세팅해 둔다.", b: "'가서 사면 되지' 출발 전날 눈에 보이는 대로 챙긴다.", left: 'S', right: 'A' },
-            { type: 'SA', a: "'왜 미리 검색을 안 했을까' 스스로 스트레스를 받는다.", b: "'오, 근처 다른 맛집을 찾을 기회네!' 오히려 설렌다.", left: 'S', right: 'A' },
-            { type: 'SA', a: "도착 예정 시간과 최적의 경로를 철저히 따른다.", b: "가끔은 내비게이션을 끄고 낯선 골목을 걸어본다.", left: 'S', right: 'A' },
-            { type: 'SA', a: "시간 단위로 할 일과 미팅이 빼곡하게 적혀 있다.", b: "굵직한 약속만 적혀 있고 여백이 훨씬 많다.", left: 'S', right: 'A' },
-            { type: 'SA', a: "미리미리 여유 있게 끝내놔야 마음이 편하다.", b: "마감 직전 폭발하는 아드레날린의 효율을 믿는다.", left: 'S', right: 'A' }
+            // 지표 1: 사역의 위치 (F vs B)
+            { q: "모임에 어색한 정적이 흐를 때,", a: "내가 먼저 아무 말이나 던져 침묵을 깬다.", b: "누군가 말할 때까지 속으로 기다린다.", left: 'F', right: 'B', cat: 'Position' },
+            { q: "지인과 함께 식사를 하러갈 때,", a: "먼저 물컵과 수저를 세팅한다.", b: "조심히 상황을 지켜보며 기다린다.", left: 'F', right: 'B', cat: 'Position' },
+            { q: "팀 프로젝트를 진행할 때,", a: "마이크를 잡고 스피치 하는 발표자", b: "타이밍 맞춰 PPT를 넘겨주는 오퍼레이터", left: 'F', right: 'B', cat: 'Position' },
+            { q: "사역의 자리나 아웃리치에서,", a: "기획을 하는 것이 마음이 편하다.", b: "기획된 대로 움직이는 것이 편하다.", left: 'F', right: 'B', cat: 'Position' },
+            { q: "전자기기나 유행에 대해서,", a: "늘 새로운 것을 시도하는 얼리어답터", b: "늘 익숙한 것을 추구하는 안정형", left: 'F', right: 'B', cat: 'Position' },
+            
+            // 지표 2: 사역의 무대 (W vs L)
+            { q: "식당에서 메뉴를 고를 때,", a: "\"안 먹어본 오늘의 특선!\" 낯선 맛에 도전한다.", b: "\"늘 먹던 실패 없는 그 맛!\" 단골 메뉴를 시킨다.", left: 'W', right: 'L', cat: 'Stage' },
+            { q: "서점에 가서 베스트셀러 코너를 볼 때,", a: "지구 반대편의 역사나 세계 정세 책에 손이 간다.", b: "내 삶에 바로 적용할 수 있는 실용서에 손이 간다.", left: 'W', right: 'L', cat: 'Stage' },
+            { q: "나에게 진짜 '쉼'이 필요할 때,", a: "비행기를 타고 한 번도 안 가본 곳으로 떠난다.", b: "가장 익숙한 내 방 침대에서 OTT를 본다.", left: 'W', right: 'L', cat: 'Stage' },
+            { q: "나에게 조금 더 와닿고 눈물이 나는 기도는,", a: "이름 모를 미전도 종족과 선교사님을 향한 기도", b: "나의 가족과 직장 동료, 내 옆자리 지체를 위한 기도", left: 'W', right: 'L', cat: 'Stage' },
+            { q: "나의 유튜브 알고리즘에는,", a: "해외여행 브이로그, 걸어서 세계속으로 등", b: "국내 핫플 리뷰, 일상 브이로그, 자기계발 등", left: 'W', right: 'L', cat: 'Stage' },
+
+            // 지표 3: 접근 방식 (R vs T)
+            { q: "함께 일하던 팀원이 큰 실수를 했을 때,", a: "\"괜찮아? 많이 당황했지?\" 마음부터 챙긴다.", b: "\"어떻게 수습할지 플랜부터 짜자.\" 해결책부터 챙긴다.", left: 'R', right: 'T', cat: 'Approach' },
+            { q: "모임에 지각해서 문을 열고 들어갈 때,", a: "\"다들 정말 미안해! 많이 기다렸지?\"", b: "\"지금 모임 어디까지 진행됐어?\"", left: 'R', right: 'T', cat: 'Approach' },
+            { q: "함께 일할 파트너를 고를 때,", a: "성격이 원만하고 소통 방식이 잘 맞는 사람", b: "일 처리 능력이 확실하고 자기 몫을 다하는 사람", left: 'R', right: 'T', cat: 'Approach' },
+            { q: "누군가에게 문제가 생겼을 때,", a: "조용히 옆에 앉아 끄덕이며 이야기를 들어준다.", b: "그 사람의 문제를 실질적으로 해결할 방법을 찾는다.", left: 'R', right: 'T', cat: 'Approach' },
+            { q: "누군가에게 줄 선물을 준비할 때,", a: "이 선물을 받고 감동할 지인의 표정을 떠올린다.", b: "지인에게 지금 가장 실질적인 도움이 될 물건을 찾는다.", left: 'R', right: 'T', cat: 'Approach' },
+
+            // 지표 4: 상황 대처 (S vs A)
+            { q: "공동체 수련회나 아웃리치 짐을 쌀 때,", a: "\"혹시 모르니까\" 며칠 전부터 완벽하게 세팅한다.", b: "\"가서 사면 되지\" 출발 전날 눈에 보이는 대로 챙긴다.", left: 'S', right: 'A', cat: 'Adaptability' },
+            { q: "가기로 한 식당이 하필 오늘 휴무일일 때,", a: "'왜 미리 검색을 안 했을까' 극심한 스트레스를 받는다.", b: "'오, 다른 맛집을 찾을 기회네!' 오히려 설렌다.", left: 'S', right: 'A', cat: 'Adaptability' },
+            { q: "어떤 목적지를 찾아 갈 때,", a: "도착 예정 시간과 최적의 경로를 철저히 따른다.", b: "가끔은 내비게이션을 끄고 낯선 골목을 걸어본다.", left: 'S', right: 'A', cat: 'Adaptability' },
+            { q: "내 스마트폰 캘린더의 상태는,", a: "시간 단위로 할 일과 미팅이 빼곡하게 적혀 있다.", b: "굵직한 약속만 적혀 있고 여백이 훨씬 많다.", left: 'S', right: 'A', cat: 'Adaptability' },
+            { q: "마감일이 정해진 사역이나 업무를 할 때,", a: "미리미리 끝내놔야 마음 편히 발 뻗고 잔다.", b: "마감 직전 폭발하는 아드레날린의 효율을 믿는다.", left: 'S', right: 'A', cat: 'Adaptability' }
         ];
 
         const results = {
@@ -160,15 +161,9 @@
         let questions = [];
         let currentIndex = 0;
         let scores = { F: 0, B: 0, W: 0, L: 0, R: 0, T: 0, S: 0, A: 0 };
-        let answerHistory = [];
+        let history = [];
 
-        function shuffle(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            return array;
-        }
+        function shuffle(arr) { return arr.sort(() => Math.random() - 0.5); }
 
         function startTest() {
             questions = shuffle([...rawQuestions]);
@@ -179,40 +174,33 @@
 
         function showQuestion() {
             const q = questions[currentIndex];
-            
-            // 애니메이션 재실행을 위해 클래스 제거 후 다시 추가
             const container = document.getElementById('question-container');
+            
             container.classList.remove('question-fade');
-            void container.offsetWidth; // 리플로우 강제 발생
+            void container.offsetWidth;
             container.classList.add('question-fade');
 
+            document.getElementById('scenario-text').innerText = q.q;
             document.getElementById('option-a').innerText = q.a;
             document.getElementById('option-b').innerText = q.b;
             document.getElementById('progress-text').innerText = `${currentIndex + 1} / 20`;
             document.getElementById('progress-bar').style.width = `${((currentIndex + 1) / 20) * 100}%`;
+            document.getElementById('indicator-name').innerText = q.cat;
             document.getElementById('prev-btn').style.visibility = currentIndex === 0 ? 'hidden' : 'visible';
-            
-            const names = { 'FB': 'Position', 'WL': 'Stage', 'RT': 'Approach', 'SA': 'Adaptability' };
-            document.getElementById('indicator-name').innerText = names[q.type];
             window.scrollTo(0,0);
         }
 
-        function handleAnswer(points, side) {
-            // 클릭된 버튼의 포커스를 즉시 해제 (잔상 방지)
-            if (document.activeElement) {
-                document.activeElement.blur();
-            }
-
+        function handleAnswer(pts, side) {
+            if (document.activeElement) document.activeElement.blur();
             const q = questions[currentIndex];
             const type = side === 'left' ? q.left : q.right;
             
-            scores[type] += points;
-            answerHistory.push({ type, points });
+            scores[type] += pts;
+            history.push({ type, pts });
 
             if (currentIndex < 19) {
                 currentIndex++;
-                // 약간의 딜레이를 주어 클릭감을 느끼게 한 뒤 전환 (선택 사항)
-                setTimeout(showQuestion, 150);
+                setTimeout(showQuestion, 200);
             } else {
                 showResult();
             }
@@ -220,27 +208,24 @@
 
         function goBack() {
             if (currentIndex > 0) {
-                const lastAnswer = answerHistory.pop();
-                scores[lastAnswer.type] -= lastAnswer.points;
+                const last = history.pop();
+                scores[last.type] -= last.pts;
                 currentIndex--;
                 showQuestion();
             }
         }
 
         function showResult() {
-            let mbti = "";
-            mbti += scores.F >= scores.B ? "F" : "B";
-            mbti += scores.W >= scores.L ? "W" : "L";
-            mbti += scores.R >= scores.T ? "R" : "T";
-            mbti += scores.S >= scores.A ? "S" : "A";
+            const mbti = (scores.F >= scores.B ? "F" : "B") + 
+                         (scores.W >= scores.L ? "W" : "L") + 
+                         (scores.R >= scores.T ? "R" : "T") + 
+                         (scores.S >= scores.A ? "S" : "A");
 
-            const resultData = results[mbti];
-            
             document.getElementById('question-screen').classList.add('hidden');
             document.getElementById('result-screen').classList.remove('hidden');
             document.getElementById('result-code').innerText = mbti;
-            document.getElementById('result-title').innerText = resultData[0];
-            document.getElementById('result-desc').innerText = resultData[1];
+            document.getElementById('result-title').innerText = results[mbti][0];
+            document.getElementById('result-desc').innerText = results[mbti][1];
             window.scrollTo(0,0);
         }
     </script>
