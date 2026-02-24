@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>선교 적성 검사 (Mission MBTI)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700&display=swap" rel="stylesheet">
@@ -12,7 +12,11 @@
             background-color: #f8fafc; 
             word-break: keep-all; 
             overflow-wrap: break-word;
+            /* 터치 시 확대 및 파란 하이라이트 방지 */
+            touch-action: manipulation;
             -webkit-tap-highlight-color: transparent;
+            -webkit-user-select: none; /* 텍스트 선택 방지 (선택 사항) */
+            user-select: none;
         }
         .circle-btn { transition: all 0.2s; cursor: pointer; border: 2px solid #e2e8f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: white; flex-shrink: 0; }
         .circle-btn:active { transform: scale(0.9); background-color: #e0e7ff; }
@@ -25,8 +29,7 @@
         .fade-in { animation: fadeIn 0.6s ease-out; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* 이미지 그림자 효과 */
-        .type-img-shadow { filter: drop-shadow(0 10px 8px rgba(0, 0, 0, 0.1)); }
+        .type-img-shadow { filter: drop-shadow(0 10px 12px rgba(0, 0, 0, 0.15)); }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-4">
@@ -45,7 +48,7 @@
         <div class="mb-6 px-2">
             <div class="flex justify-between text-[10px] text-gray-400 mb-2 uppercase tracking-widest font-bold">
                 <span id="progress-text">1 / 20</span>
-                <span id="indicator-name" class="text-indigo-500 italic">Position</span>
+                <span id="indicator-name" class="text-indigo-500 italic font-black">Position</span>
             </div>
             <div class="w-full bg-gray-200 h-1 rounded-full overflow-hidden">
                 <div id="progress-bar" class="progress-bar bg-indigo-500 h-full transition-all duration-300" style="width: 5%"></div>
@@ -55,7 +58,7 @@
         <div id="question-container" class="bg-white rounded-[2.5rem] p-7 shadow-sm border border-gray-100 flex flex-col question-fade">
             <div class="text-center mb-6">
                 <span class="inline-block bg-indigo-50 text-indigo-600 text-[11px] font-bold px-3 py-1 rounded-full mb-3 uppercase tracking-tighter">Scenario</span>
-                <h2 id="scenario-text" class="text-xl font-extrabold text-gray-900 leading-snug px-2 italic">상황 질문</h2>
+                <h2 id="scenario-text" class="text-xl font-extrabold text-gray-900 leading-snug px-2">상황 질문</h2>
             </div>
 
             <div class="space-y-4">
@@ -64,11 +67,11 @@
                     <div class="flex justify-center gap-6">
                         <button onclick="handleAnswer(2, 'left')" class="flex flex-col items-center gap-1 group">
                             <div class="circle-btn circle-lg border-2 border-indigo-200 shadow-sm"></div>
-                            <span class="text-[10px] text-gray-400 font-bold group-active:text-indigo-600">매우 그렇다</span>
+                            <span class="text-[10px] text-gray-400 font-bold">매우 그렇다</span>
                         </button>
                         <button onclick="handleAnswer(1, 'left')" class="flex flex-col items-center gap-1 group">
                             <div class="circle-btn circle-sm border-gray-200 shadow-sm mt-1.5"></div>
-                            <span class="text-[10px] text-gray-400 font-bold group-active:text-indigo-600">약간 그렇다</span>
+                            <span class="text-[10px] text-gray-400 font-bold">약간 그렇다</span>
                         </button>
                     </div>
                 </div>
@@ -77,11 +80,11 @@
                     <div class="flex justify-center gap-6 mb-4">
                         <button onclick="handleAnswer(1, 'right')" class="flex flex-col items-center gap-1 group">
                             <div class="circle-btn circle-sm border-gray-200 shadow-sm mb-1.5"></div>
-                            <span class="text-[10px] text-gray-400 font-bold group-active:text-indigo-600">약간 그렇다</span>
+                            <span class="text-[10px] text-gray-400 font-bold">약간 그렇다</span>
                         </button>
                         <button onclick="handleAnswer(2, 'right')" class="flex flex-col items-center gap-1 group">
                             <div class="circle-btn circle-lg border-2 border-indigo-200 shadow-sm"></div>
-                            <span class="text-[10px] text-gray-400 font-bold group-active:text-indigo-600">매우 그렇다</span>
+                            <span class="text-[10px] text-gray-400 font-bold">매우 그렇다</span>
                         </button>
                     </div>
                     <p id="option-b" class="text-center text-gray-700 font-semibold text-[15px]">선택지 B</p>
@@ -95,7 +98,7 @@
                     </svg>
                     PREV
                 </button>
-                <span class="text-[9px] text-gray-300 font-black tracking-widest uppercase">Missionary Aptitude Test</span>
+                <span class="text-[9px] text-gray-300 font-black tracking-widest uppercase">Missionary Test</span>
             </div>
         </div>
     </div>
@@ -109,7 +112,7 @@
             </div>
 
             <div id="result-code" class="text-5xl font-black text-indigo-900 mb-2 tracking-tighter italic">TYPE</div>
-            <h2 id="result-title" class="text-2xl font-bold text-gray-800 mb-8 break-keep">유형 이름</h2>
+            <h2 id="result-title" class="text-2xl font-bold text-gray-800 mb-8 break-keep px-4">유형 이름</h2>
             
             <div class="w-10 h-1 bg-indigo-500 mx-auto mb-10 rounded-full"></div>
             
@@ -120,7 +123,6 @@
     </div>
 
     <script>
-        // 질문 데이터 (생략 - 이전과 동일)
         const rawQuestions = [
             { q: "모임에 어색한 정적이 흐를 때,", a: "내가 먼저 아무 말이나 던져 침묵을 깬다.", b: "누군가 말할 때까지 속으로 기다린다.", left: 'F', right: 'B', cat: 'Position' },
             { q: "지인과 함께 식사를 하러갈 때,", a: "먼저 물컵과 수저를 세팅한다.", b: "조심히 상황을 지켜보며 기다린다.", left: 'F', right: 'B', cat: 'Position' },
@@ -144,7 +146,6 @@
             { q: "마감일이 정해진 사역이나 업무를 할 때,", a: "미리미리 끝내놔야 마음 편히 발 뻗고 잔다.", b: "마감 직전 폭발하는 아드레날린의 효율을 믿는다.", left: 'S', right: 'A', cat: 'Adaptability' }
         ];
 
-        // 결과 데이터 (이미지 번호 추가)
         const results = {
             "FWRS": { title: "준비된 글로벌 프론티어", desc: "선교지 최전방에서 현지인과 깊게 교제하며, 철저하게 계획된 일정대로 전도하는 빈틈없는 개척자.", img: 1 },
             "FWRA": { title: "성령충만 글로벌 인싸", desc: "낯선 타문화권에서도 바디랭귀지로 현지인과 5분 만에 베프가 되는 자유로운 영혼의 소유자.", img: 2 },
@@ -181,9 +182,11 @@
         function showQuestion() {
             const q = questions[currentIndex];
             const container = document.getElementById('question-container');
+            
             container.classList.remove('question-fade');
             void container.offsetWidth;
             container.classList.add('question-fade');
+
             document.getElementById('scenario-text').innerText = q.q;
             document.getElementById('option-a').innerText = q.a;
             document.getElementById('option-b').innerText = q.b;
@@ -191,16 +194,23 @@
             document.getElementById('progress-bar').style.width = `${((currentIndex + 1) / 20) * 100}%`;
             document.getElementById('indicator-name').innerText = q.cat;
             document.getElementById('prev-btn').style.visibility = currentIndex === 0 ? 'hidden' : 'visible';
+            window.scrollTo(0,0);
         }
 
         function handleAnswer(pts, side) {
             if (document.activeElement) document.activeElement.blur();
             const q = questions[currentIndex];
             const type = side === 'left' ? q.left : q.right;
+            
             scores[type] += pts;
             history.push({ type, pts });
-            if (currentIndex < 19) { currentIndex++; setTimeout(showQuestion, 200); } 
-            else { showResult(); }
+
+            if (currentIndex < 19) {
+                currentIndex++;
+                setTimeout(showQuestion, 200);
+            } else {
+                showResult();
+            }
         }
 
         function goBack() {
@@ -220,14 +230,13 @@
 
             const resultData = results[mbti];
             
-            // 이미지 경로 설정 (GitHub에 올릴 경로로 수정 가능)
-            // 예: "https://your-github-name.github.io/repo-name/images/"
+            // 이미지 경로 설정 (대문자 .PNG로 변경됨)
             const imagePath = "./"; 
             
             document.getElementById('question-screen').classList.add('hidden');
             document.getElementById('result-screen').classList.remove('hidden');
             
-            document.getElementById('result-img').src = `${imagePath}${resultData.img}.png`;
+            document.getElementById('result-img').src = `${imagePath}${resultData.img}.PNG`;
             document.getElementById('result-code').innerText = mbti;
             document.getElementById('result-title').innerText = resultData.title;
             document.getElementById('result-desc').innerText = resultData.desc;
