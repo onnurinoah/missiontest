@@ -2,212 +2,271 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>선교 적성 검사 (Mission MBTI)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>걸어서 지구 한바퀴 - 라이브 시뮬레이션</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <style>
-        body { font-family: 'Pretendard', sans-serif; background-color: #f8fafc; }
-        .circle-btn { transition: all 0.2s; cursor: pointer; border: 2px solid #e2e8f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: white; }
-        .circle-btn:hover { border-color: #6366f1; transform: scale(1.05); }
-        .circle-lg { width: 64px; height: 64px; }
-        .circle-sm { width: 48px; height: 48px; }
-        .progress-bar { transition: width 0.3s ease-in-out; }
-        .fade-in { animation: fadeIn 0.5s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @import url('https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Pretendard:wght@400;700;900&display=swap');
+        body { margin: 0; background: #00050a; color: white; font-family: 'Pretendard', sans-serif; overflow: hidden; height: 100dvh; touch-action: none; }
+        #canvas-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
+        .ui-overlay { position: relative; z-index: 10; pointer-events: none; height: 100%; display: flex; flex-direction: column; justify-content: space-between; padding: 3rem 1.5rem; }
+        .interactive { pointer-events: auto; }
+        .title-font { font-family: 'Black Han Sans', sans-serif; }
+        .glass { background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-center p-4">
+<body>
 
-    <div id="start-screen" class="max-w-md w-full text-center fade-in">
-        <div class="mb-8 text-6xl">🧬</div>
-        <h1 class="text-3xl font-bold text-gray-800 mb-4">선교 적성 검사</h1>
-        <p class="text-gray-600 mb-8 leading-relaxed">나의 선교적 성향은 무엇일까요?<br>20개의 문항을 통해 당신의 사역 유형을 확인해보세요.</p>
-        <button onclick="startTest()" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-semibold text-lg hover:bg-indigo-700 shadow-lg transition">테스트 시작하기</button>
+    <div id="canvas-container"></div>
+
+    <div class="fixed top-8 right-8 z-20 text-right interactive">
+        <p class="text-[10px] text-yellow-400/70 font-bold tracking-[0.2em] uppercase mb-1">Target: 2026.06.19</p>
+        <div id="dday-text" class="title-font text-4xl text-white drop-shadow-2xl">D-Day</div>
     </div>
 
-    <div id="question-screen" class="max-w-2xl w-full hidden fade-in">
-        <div class="mb-6">
-            <div class="flex justify-between text-sm text-gray-400 mb-2">
-                <span id="progress-text">1 / 20</span>
-                <span id="indicator-name" class="font-semibold text-indigo-500">지표 분석 중...</span>
-            </div>
-            <div class="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
-                <div id="progress-bar" class="progress-bar bg-indigo-500 h-full" style="width: 5%"></div>
-            </div>
-        </div>
+    <div class="fixed bottom-8 left-8 z-30 interactive">
+        <button id="test-btn" onclick="runLiveSimulation()" class="glass px-6 py-3 rounded-full text-xs font-black text-yellow-400 border border-yellow-400/50 hover:bg-yellow-400 hover:text-black transition-all">
+            🔥 1,000명 동시입력 시뮬레이션
+        </button>
+        <p id="test-status" class="text-[10px] text-slate-500 mt-2 ml-2 hidden">시뮬레이션 진행 중... <span id="test-count">0</span>/1000</p>
+    </div>
 
-        <div class="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 min-h-[400px] flex flex-col justify-between">
-            <div class="text-center">
-                <h2 id="question-title" class="text-xl font-bold text-gray-800 mb-10 leading-snug">질문 내용이 들어갑니다.</h2>
-                
-                <div class="flex flex-col gap-8">
-                    <div id="option-a" class="text-lg text-gray-700 font-medium px-4">선택지 A</div>
-                    
-                    <div class="flex items-center justify-center gap-4 md:gap-8 py-4">
-                        <div class="flex flex-col items-center gap-2">
-                            <button onclick="handleAnswer(2, 'left')" class="circle-btn circle-lg shadow-sm"></button>
-                            <span class="text-xs text-gray-400">매우 그렇다</span>
-                        </div>
-                        <div class="flex flex-col items-center gap-2">
-                            <button onclick="handleAnswer(1, 'left')" class="circle-btn circle-sm shadow-sm"></button>
-                            <span class="text-xs text-gray-400">약간 그렇다</span>
-                        </div>
-                        <div class="flex flex-col items-center gap-2">
-                            <button onclick="handleAnswer(1, 'right')" class="circle-btn circle-sm shadow-sm"></button>
-                            <span class="text-xs text-gray-400">약간 그렇다</span>
-                        </div>
-                        <div class="flex flex-col items-center gap-2">
-                            <button onclick="handleAnswer(2, 'right')" class="circle-btn circle-lg shadow-sm"></button>
-                            <span class="text-xs text-gray-400">매우 그렇다</span>
-                        </div>
-                    </div>
-
-                    <div id="option-b" class="text-lg text-gray-700 font-medium px-4">선택지 B</div>
+    <div class="ui-overlay">
+        <div class="text-center">
+            <p id="user-greeting" class="text-yellow-400 text-sm font-bold tracking-[0.3em] mb-2 title-font">우리들의 지구 여행</p>
+            <div class="flex items-center justify-center gap-4">
+                <h1 class="title-font text-7xl md:text-9xl tracking-tighter">
+                    <span id="dist-text">0.00</span><span class="text-2xl text-slate-500 ml-2 font-sans italic">km</span>
+                </h1>
+                <div class="text-left border-l border-white/20 pl-4">
+                    <div id="percent-text" class="text-3xl md:text-4xl font-black text-yellow-400 leading-none">0.00%</div>
+                    <div class="text-[10px] text-slate-400 font-bold mt-1 uppercase">Total Progress</div>
                 </div>
             </div>
+        </div>
 
-            <div class="mt-8 flex justify-start">
-                <button id="prev-btn" onclick="goBack()" class="text-gray-400 hover:text-indigo-500 flex items-center gap-1 transition">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
-                    </svg>
-                    이전으로
-                </button>
-            </div>
+        <div class="w-full max-w-md mx-auto space-y-4 text-center">
+            <button onclick="startRecordFlow()" class="interactive w-full py-6 bg-white text-black rounded-2xl font-black text-2xl shadow-2xl active:scale-95 transition-transform">
+                기록 추가하기
+            </button>
         </div>
     </div>
 
-    <div id="result-screen" class="max-w-2xl w-full hidden fade-in">
-        <div class="bg-white rounded-3xl p-10 shadow-xl border border-indigo-50 text-center">
-            <h3 class="text-indigo-600 font-bold mb-2 uppercase tracking-widest">Your Mission Type</h3>
-            <h2 id="result-type" class="text-4xl font-extrabold text-gray-900 mb-6">결과 유형</h2>
-            <div class="w-20 h-1 bg-indigo-500 mx-auto mb-8 rounded-full"></div>
-            <p id="result-desc" class="text-lg text-gray-600 leading-relaxed mb-10 text-left bg-indigo-50 p-6 rounded-2xl whitespace-pre-wrap">결과 설명이 들어갑니다.</p>
-            <button onclick="location.reload()" class="bg-gray-800 text-white px-8 py-3 rounded-xl font-medium hover:bg-black transition">테스트 다시하기</button>
+    <div id="modal-backdrop" class="fixed inset-0 z-50 hidden flex items-center justify-center p-6 bg-black/90 backdrop-blur-xl transition-all">
+        <div id="login-modal" class="interactive glass w-full max-w-sm p-8 rounded-[40px] text-white text-center hidden">
+            <h3 class="title-font text-3xl mb-8 text-yellow-400">본인 확인</h3>
+            <input type="text" id="loginName" placeholder="이름" class="w-full bg-white/5 border border-white/10 rounded-2xl p-4 mb-4 outline-none focus:border-yellow-400 font-bold text-center">
+            <input type="tel" id="loginPhone" maxlength="4" placeholder="휴대폰 뒷 4자리" class="w-full bg-white/5 border border-white/10 rounded-2xl p-4 mb-8 outline-none focus:border-yellow-400 font-bold text-center">
+            <div class="flex gap-4">
+                <button onclick="closeModals()" class="flex-1 py-4 text-slate-400 font-bold">취소</button>
+                <button onclick="handleLogin()" class="flex-1 py-4 bg-yellow-400 text-black rounded-2xl font-black">확인</button>
+            </div>
+        </div>
+
+        <div id="record-modal" class="interactive glass w-full max-w-sm p-8 rounded-[40px] text-white text-center hidden">
+            <h3 id="modal-user-title" class="title-font text-3xl mb-2 text-yellow-400">사용자</h3>
+            <p class="text-slate-400 text-sm mb-8 uppercase tracking-widest">How many km today?</p>
+            <input type="number" id="inputKm" step="0.1" placeholder="0.0" class="w-full bg-white/5 border border-white/10 rounded-2xl p-6 mb-8 outline-none focus:border-yellow-400 text-5xl font-black text-center text-yellow-400">
+            <div class="flex gap-4">
+                <button onclick="closeModals()" class="flex-1 py-4 text-slate-400 font-bold">취소</button>
+                <button onclick="submitRecord()" class="flex-1 py-4 bg-yellow-400 text-black rounded-2xl font-black">저장하기</button>
+            </div>
         </div>
     </div>
 
     <script>
-        const rawQuestions = [
-            // 지표 1: F vs B
-            { type: 'FB', a: "내가 먼저 아무 말이나 던져 침묵을 깬다.", b: "누군가 말할 때까지 속으로 기다린다.", left: 'F', right: 'B' },
-            { type: 'FB', a: "먼저 물컵과 수저를 세팅한다.", b: "조심히 상황을 지켜보며 기다린다.", left: 'F', right: 'B' },
-            { type: 'FB', a: "마이크를 잡고 스피치 하는 발표자", b: "타이밍 맞춰 PPT를 넘겨주는 오퍼레이터", left: 'F', right: 'B' },
-            { type: 'FB', a: "기획을 하는 것이 마음이 편하다.", b: "기획된 대로 움직이는 것이 편하다.", left: 'F', right: 'B' },
-            { type: 'FB', a: "늘 새로운 것을 시도하는 얼리어답터", b: "늘 익숙한 것을 추구하는 안정형", left: 'F', right: 'B' },
-            // 지표 2: W vs L
-            { type: 'WL', a: "'안 먹어본 오늘의 특선!' 낯선 맛에 도전한다.", b: "'늘 먹던 실패 없는 그 맛!' 단골 메뉴를 시킨다.", left: 'W', right: 'L' },
-            { type: 'WL', a: "지구 반대편의 역사나 세계 정세에 관한 책에 손이 간다.", b: "내 삶에 바로 적용할 수 있는 에세이나 실용서에 손이 간다.", left: 'W', right: 'L' },
-            { type: 'WL', a: "비행기를 타고 한 번도 안 가본 곳으로 떠난다.", b: "익숙한 내 방 침대에서 좋아하는 OTT를 본다.", left: 'W', right: 'L' },
-            { type: 'WL', a: "이름 모를 미전도 종족과 선교사님을 향한 기도", b: "나의 가족과 직장 동료, 내 옆자리 지체를 위한 기도", left: 'W', right: 'L' },
-            { type: 'WL', a: "해외여행 브이로그, 걸어서 세계속으로 채널", b: "국내 핫플 리뷰, 일상 브이로그, 자기계발 채널", left: 'W', right: 'L' },
-            // 지표 3: R vs T
-            { type: 'RT', a: "'괜찮아? 많이 당황했지?' 마음부터 챙긴다.", b: "'어떻게 수습할지 플랜부터 짜자.' 해결책부터 챙긴다.", left: 'R', right: 'T' },
-            { type: 'RT', a: "'다들 정말 미안해! 많이 기다렸지?'", b: "'지금 모임 어디까지 진행됐어?'", left: 'R', right: 'T' },
-            { type: 'RT', a: "성격이 원만하고 소통 방식이 잘 맞는 사람", b: "일 처리 능력이 확실하고 자기 몫을 다하는 사람", left: 'R', right: 'T' },
-            { type: 'RT', a: "조용히 옆에 앉아 끄덕이며 끝까지 이야기를 들어준다.", b: "그 사람의 문제를 실질적으로 해결할 방법을 찾아준다.", left: 'R', right: 'T' },
-            { type: 'RT', a: "이 선물을 받고 감동할 지인의 표정을 떠올린다.", b: "지인에게 지금 가장 실질적인 도움이 될 물건을 찾는다.", left: 'R', right: 'T' },
-            // 지표 4: S vs A
-            { type: 'SA', a: "'혹시 모르니까' 며칠 전부터 완벽하게 다 세팅해 둔다.", b: "'가서 사면 되지' 출발 전날 눈에 보이는 대로 챙긴다.", left: 'S', right: 'A' },
-            { type: 'SA', a: "'왜 미리 검색을 안 했을까' 스스로 스트레스를 받는다.", b: "'오, 근처 다른 맛집을 찾을 기회네!' 오히려 설렌다.", left: 'S', right: 'A' },
-            { type: 'SA', a: "도착 예정 시간과 최적의 경로를 철저히 따른다.", b: "가끔은 내비게이션을 끄고 낯선 골목을 걸어본다.", left: 'S', right: 'A' },
-            { type: 'SA', a: "시간 단위로 할 일과 미팅이 빼곡하게 적혀 있다.", b: "굵직한 약속만 적혀 있고 여백이 훨씬 많다.", left: 'S', right: 'A' },
-            { type: 'SA', a: "미리미리 여유 있게 끝내놔야 마음이 편하다.", b: "마감 직전 폭발하는 아드레날린의 효율을 믿는다.", left: 'S', right: 'A' }
-        ];
+        let scene, camera, renderer, globe, marker, controls, pathTube;
+        const EARTH_CIRCUMFERENCE = 40075; 
+        const GLOBE_RADIUS = 2;
+        const PATH_RADIUS = 2.18;
+        
+        let appData = JSON.parse(localStorage.getItem('earthData_V3')) || { users: {}, totalGlobalKm: 0 };
+        let currentUser = null;
 
-        const results = {
-            "FWRS": ["준비된 글로벌 프론티어", "선교지 최전방에서 현지인과 깊게 교제하며, 철저하게 계획된 일정대로 전도하는 빈틈없는 개척자."],
-            "FWRA": ["성령충만 글로벌 인싸", "낯선 타문화권에서도 바디랭귀지로 현지인과 5분 만에 베프가 되는 자유로운 영혼의 소유자."],
-            "FWTS": ["열방의 홀리 버스커", "등 뒤에 기타 하나 둘러메고 당당하게 앞장서며, 완벽하게 기획된 공연이나 사역으로 선교지 무대를 장악하는 달란트 부자."],
-            "FWTA": ["위기탈출 타문화 특공대", "선교지에서 음향이 꺼지거나 돌발 상황이 생겨도, 특유의 순발력과 끼로 분위기를 확 띄우는 무대 위 해결사."],
-            "FLRS": ["일상의 전략적 멘토", "학교나 직장에서 믿지 않는 영혼을 마음에 품고, 치밀하게 타이밍을 재어 밥을 사주며 복음을 전하는 관계 전도의 달인."],
-            "FLRA": ["동네방네 빛과 소금", "우리 교회 공동체나 일상 속에서 누구와도 스스럼없이 어울리며, 삶의 자연스러운 모습으로 그리스도의 향기를 뿜어내는 인싸."],
-            "FLTS": ["공동체 하드캐리 리더", "새해 성경통독 프로그램이나 청년부 수련회 등 중요한 사역을 철저하게 기획하고 맨 앞에서 끌고 가는 열정 리더."],
-            "FLTA": ["순발력 만렙 사역자", "교회에서 갑작스럽게 간증이나 특송, 레크리에이션 진행을 부탁받아도 당황하지 않고 은혜롭게 해내는 만능 엔터테이너."],
-            "BWRS": ["선교지 마더 테레사", "눈에 띄지 않는 곳에서 현지인들의 필요와 아픔을 꼼꼼하게 살피고 품어주는 따뜻한 심장."],
-            "BWRA": ["국경 초월 힐러", "프로그램 중심의 사역보다는, 현지 아이들을 그저 묵묵히 안아주고 상황에 맞춰 돌봐주는 데서 큰 기쁨을 느끼는 사람."],
-            "BWTS": ["파워 스케쥴 선교 네비게이터", "항공권, 재정 관리, 사역 타임테이블 등 선교의 뼈대를 오차 없이 완벽하게 세워 팀을 이끄는 보이지 않는 브레인."],
-            "BWTA": ["선교지 만능 맥가이버", "무더운 날 짐을 나르거나 식사를 챙기는 등, 선교 현장에서 발생하는 온갖 돌발적인 궂은일을 말없이 척척 해결하는 기둥."],
-            "BLRS": ["비밀 중보기도 요원", "기도 노트에 지체들의 이름을 빼곡히 적어두고, 치밀하고 구체적으로 영적 전쟁의 최후방을 지키는 기도의 용사."],
-            "BLRA": ["공동체 인간 핫팩", "공동체 모임에서 어색해하거나 소외된 새가족 곁에 유연하게 다가가, 조용히 말을 건네며 마음을 녹여주는 따뜻한 난로."],
-            "BLTS": ["디테일 깎는 장인", "청년부 행사 때 PPT, 영상, 회계 등 가장 손이 많이 가고 티 안 나는 사역을 완벽하게 준비하는 보이지 않는 손."],
-            "BLTA": ["교회의 숨은 천사", "일손이 부족하거나 펑크 난 자리가 생기면 제일 먼저 달려와 그 자리를 기꺼이 메워주는, 묵묵하지만 가장 든든한 동역자."]
-        };
+        function init3D() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.toneMapping = THREE.ReinhardToneMapping;
+            renderer.toneMappingExposure = 1.5;
+            document.getElementById('canvas-container').appendChild(renderer.domElement);
 
-        let questions = [];
-        let currentIndex = 0;
-        let scores = { F: 0, B: 0, W: 0, L: 0, R: 0, T: 0, S: 0, A: 0 };
-        let answerHistory = [];
+            const textureLoader = new THREE.TextureLoader();
+            scene.background = textureLoader.load('countdown.jpg', null, null, () => { scene.background = new THREE.Color(0x00050a); });
 
-        function shuffle(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            return array;
+            const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
+            scene.add(ambientLight);
+            const sunLight = new THREE.DirectionalLight(0xffffff, 1.5);
+            sunLight.position.set(5, 3, 5);
+            scene.add(sunLight);
+
+            // 지구본: 채도와 반사광 대폭 강화
+            const earthTexture = textureLoader.load('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg');
+            globe = new THREE.Mesh(
+                new THREE.SphereGeometry(GLOBE_RADIUS, 64, 64), 
+                new THREE.MeshStandardMaterial({ 
+                    map: earthTexture, 
+                    roughness: 0.3, 
+                    metalness: 0.6,
+                    emissive: 0x112244,
+                    emissiveIntensity: 0.5
+                })
+            );
+            scene.add(globe);
+
+            marker = new THREE.Group();
+            const glow = new THREE.Sprite(new THREE.SpriteMaterial({
+                map: textureLoader.load('https://threejs.org/examples/textures/lensflare/lensflare0.png'),
+                color: 0xffcc00, transparent: true, blending: THREE.AdditiveBlending
+            }));
+            glow.scale.set(1.2, 1.2, 1);
+            marker.add(glow);
+            scene.add(marker);
+
+            camera.position.z = 6;
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.enableZoom = false;
+
+            updateDDay();
+            updateVisuals(appData.totalGlobalKm);
+            animate();
         }
 
-        function startTest() {
-            questions = shuffle([...rawQuestions]);
-            document.getElementById('start-screen').classList.add('hidden');
-            document.getElementById('question-screen').classList.remove('hidden');
-            showQuestion();
+        function updateDDay() {
+            const target = new Date(2026, 5, 19);
+            const diff = target - new Date();
+            const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+            document.getElementById('dday-text').innerText = days > 0 ? `D-${days}` : (days === 0 ? "D-Day" : `D+${Math.abs(days)}`);
         }
 
-        function showQuestion() {
-            const q = questions[currentIndex];
-            document.getElementById('question-title').innerText = `Q${currentIndex + 1}. ${q.type === 'FB' ? '어떤 성향에 더 가까우신가요?' : '당신의 선택은?'}`;
-            document.getElementById('option-a').innerText = q.a;
-            document.getElementById('option-b').innerText = q.b;
-            document.getElementById('progress-text').innerText = `${currentIndex + 1} / 20`;
-            document.getElementById('progress-bar').style.width = `${((currentIndex + 1) / 20) * 100}%`;
-            document.getElementById('prev-btn').style.visibility = currentIndex === 0 ? 'hidden' : 'visible';
+        function updateVisuals(km) {
+            const ratio = Math.min(km / EARTH_CIRCUMFERENCE, 1);
+            document.getElementById('dist-text').innerText = km.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('percent-text').innerText = (ratio * 100).toFixed(2) + "%";
             
-            // 지표 이름 한글화 (선택사항)
-            const names = { 'FB': '사역의 위치', 'WL': '사역의 무대', 'RT': '접근 방식', 'SA': '상황 대처' };
-            document.getElementById('indicator-name').innerText = names[q.type];
-        }
-
-        function handleAnswer(points, side) {
-            const q = questions[currentIndex];
-            const type = side === 'left' ? q.left : q.right;
+            if (pathTube) scene.remove(pathTube);
             
-            // 점수 기록
-            scores[type] += points;
-            answerHistory.push({ type, points });
+            if (ratio > 0) {
+                const points = [];
+                const segments = Math.max(2, Math.floor(ratio * 300));
+                for (let i = 0; i <= segments; i++) {
+                    const pRatio = (i / segments) * ratio;
+                    const angle = Math.PI - (pRatio * Math.PI * 2);
+                    points.push(new THREE.Vector3(Math.cos(angle) * PATH_RADIUS, Math.sin(angle) * PATH_RADIUS, 0));
+                }
 
-            if (currentIndex < 19) {
-                currentIndex++;
-                showQuestion();
+                const pathCurve = new THREE.CatmullRomCurve3(points);
+                const tubeGeo = new THREE.TubeGeometry(pathCurve, 128, 0.025, 8, false);
+                const tubeMat = new THREE.MeshStandardMaterial({ 
+                    color: 0xffd700, emissive: 0xffaa00, emissiveIntensity: 3, metalness: 1, roughness: 0 
+                });
+                pathTube = new THREE.Mesh(tubeGeo, tubeMat);
+                scene.add(pathTube);
+
+                const lastPoint = points[points.length - 1];
+                marker.position.copy(lastPoint);
             } else {
-                showResult();
+                marker.position.set(-PATH_RADIUS, 0, 0);
             }
         }
 
-        function goBack() {
-            if (currentIndex > 0) {
-                const lastAnswer = answerHistory.pop();
-                scores[lastAnswer.type] -= lastAnswer.points;
-                currentIndex--;
-                showQuestion();
-            }
-        }
-
-        function showResult() {
-            let mbti = "";
-            mbti += scores.F >= scores.B ? "F" : "B";
-            mbti += scores.W >= scores.L ? "W" : "L";
-            mbti += scores.R >= scores.T ? "R" : "T";
-            mbti += scores.S >= scores.A ? "S" : "A";
-
-            const resultData = results[mbti];
+        // --- 시뮬레이션 로직 ---
+        function runLiveSimulation() {
+            const btn = document.getElementById('test-btn');
+            const status = document.getElementById('test-status');
+            const countDisplay = document.getElementById('test-count');
             
-            document.getElementById('question-screen').classList.add('hidden');
-            document.getElementById('result-screen').classList.remove('hidden');
-            document.getElementById('result-type').innerText = resultData[0];
-            document.getElementById('result-desc').innerText = `[${mbti}] 유형\n\n${resultData[1]}`;
+            btn.disabled = true;
+            btn.style.opacity = 0.3;
+            status.classList.remove('hidden');
+
+            let count = 0;
+            const total = 1000;
+            
+            // 시뮬레이션용 인터벌 (30ms 마다 1명씩 추가, 약 30초 소요)
+            const timer = setInterval(() => {
+                count++;
+                countDisplay.innerText = count;
+                
+                // 1~20km 사이 랜덤 추가
+                const randomKm = Math.random() * 19 + 1;
+                appData.totalGlobalKm += randomKm;
+                
+                // UI 업데이트
+                updateVisuals(appData.totalGlobalKm);
+
+                if (count >= total) {
+                    clearInterval(timer);
+                    btn.disabled = false;
+                    btn.style.opacity = 1;
+                    status.classList.add('hidden');
+                    alert("1,000명 입력 시뮬레이션 완료! 3D 렌더링 성능을 확인하세요.");
+                    localStorage.setItem('earthData_V3', JSON.stringify(appData));
+                }
+            }, 30); 
         }
+
+        // --- 사용자 프로세스 ---
+        function startRecordFlow() {
+            document.getElementById('modal-backdrop').classList.remove('hidden');
+            document.getElementById('login-modal').classList.remove('hidden');
+        }
+
+        function handleLogin() {
+            const name = document.getElementById('loginName').value;
+            const phone = document.getElementById('loginPhone').value;
+            if(!name || phone.length < 4) return alert("정보를 입력해주세요.");
+            
+            currentUser = { name, phone };
+            document.getElementById('modal-user-title').innerText = name + "님";
+            document.getElementById('login-modal').classList.add('hidden');
+            document.getElementById('record-modal').classList.remove('hidden');
+        }
+
+        function submitRecord() {
+            const val = parseFloat(document.getElementById('inputKm').value);
+            if(!val || val <= 0) return alert("거리를 입력해주세요.");
+
+            const prevKm = appData.totalGlobalKm;
+            appData.totalGlobalKm += val;
+            localStorage.setItem('earthData_V3', JSON.stringify(appData));
+            
+            closeModals();
+
+            // 부드러운 숫자 카운팅 애니메이션
+            gsap.to({v: prevKm}, {
+                v: appData.totalGlobalKm,
+                duration: 2,
+                onUpdate: function() { updateVisuals(this.targets()[0].v); }
+            });
+        }
+
+        function closeModals() {
+            document.getElementById('modal-backdrop').classList.add('hidden');
+            document.getElementById('login-modal').classList.add('hidden');
+            document.getElementById('record-modal').classList.add('hidden');
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            if(globe) globe.rotation.y -= 0.002; // 지구 자전
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        init3D();
     </script>
 </body>
 </html>
