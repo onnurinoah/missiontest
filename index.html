@@ -15,30 +15,36 @@
             -webkit-user-select: none;
             user-select: none;
         }
-        /* 버튼 공통 스타일 */
-        .option-btn {
+        /* 척도 선택 버튼 스타일 */
+        .scale-btn {
             width: 100%;
-            padding: 18px 20px;
-            border-radius: 1.25rem;
+            padding: 16px;
+            border-radius: 1rem;
             background: white;
             border: 2px solid #f1f5f9;
             transition: all 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
             cursor: pointer;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            font-weight: 700;
+            font-size: 14px;
+            color: #64748b;
         }
-        .option-btn:active {
-            transform: scale(0.97);
+        .scale-btn:active {
+            transform: scale(0.98);
             background-color: #eef2ff;
             border-color: #c7d2fe;
+            color: #4f46e5;
         }
-        /* 원형 인디케이터 */
-        .dot { border-radius: 50%; border: 2px solid #e2e8f0; flex-shrink: 0; }
-        .dot-lg { width: 24px; height: 24px; }
-        .dot-sm { width: 18px; height: 18px; }
+        /* 상단/하단 상황 박스 */
+        .scenario-box {
+            padding: 18px;
+            border-radius: 1.25rem;
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
 
         .question-fade { animation: qFade 0.4s ease-out; }
         @keyframes qFade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
@@ -52,9 +58,7 @@
     <div id="start-screen" class="max-w-md w-full text-center fade-in">
         <div class="mb-6 text-6xl">🧬</div>
         <h1 class="text-3xl font-black text-gray-900 mb-4 tracking-tight">선교 적성 검사</h1>
-        <p class="text-gray-500 mb-8 leading-relaxed px-6 text-sm italic">
-            "나의 선교적 DNA는 어떤 모습일까요?"
-        </p>
+        <p class="text-gray-500 mb-8 leading-relaxed px-6 text-sm">나의 선교적 성향을 확인해보세요.</p>
         <button onclick="startTest()" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold text-lg hover:bg-indigo-700 shadow-xl transition-all active:scale-95">검사 시작하기</button>
     </div>
 
@@ -70,37 +74,30 @@
         </div>
 
         <div id="question-container" class="bg-white rounded-[2.5rem] p-7 shadow-sm border border-gray-100 question-fade">
-            <div class="text-center mb-8">
-                <span class="inline-block bg-indigo-50 text-indigo-600 text-[12px] font-bold px-4 py-1.5 rounded-full mb-4">만약에...</span>
-                <h2 id="scenario-text" class="text-xl font-extrabold text-gray-900 leading-snug px-2">상황 질문</h2>
+            <div class="text-center mb-6">
+                <span class="inline-block bg-indigo-50 text-indigo-600 text-[12px] font-bold px-4 py-1.5 rounded-full mb-3 italic">만약에...</span>
+                <h2 id="scenario-text" class="text-xl font-extrabold text-gray-900 leading-snug">질문 제목</h2>
             </div>
 
-            <div class="space-y-3">
-                <button onclick="handleAnswer(2, 'left')" class="option-btn">
-                    <div class="dot dot-lg border-indigo-400"></div>
-                    <span id="option-a-heavy" class="text-[14px] font-bold text-gray-700 text-left flex-1">A 내용 (매우 그렇다)</span>
-                </button>
-                <button onclick="handleAnswer(1, 'left')" class="option-btn">
-                    <div class="dot dot-sm"></div>
-                    <span id="option-a-light" class="text-[14px] font-semibold text-gray-600 text-left flex-1">A 내용 (약간 그렇다)</span>
-                </button>
-
-                <div class="py-2 flex items-center justify-center">
-                    <div class="w-8 h-[1px] bg-gray-100"></div>
+            <div class="flex flex-col gap-4">
+                <div class="scenario-box border-l-4 border-l-indigo-400">
+                    <p id="option-a-text" class="text-center text-gray-800 font-bold text-[15px] leading-relaxed"></p>
                 </div>
 
-                <button onclick="handleAnswer(1, 'right')" class="option-btn">
-                    <div class="dot dot-sm"></div>
-                    <span id="option-b-light" class="text-[14px] font-semibold text-gray-600 text-left flex-1">B 내용 (약간 그렇다)</span>
-                </button>
-                <button onclick="handleAnswer(2, 'right')" class="option-btn">
-                    <div class="dot dot-lg border-indigo-400"></div>
-                    <span id="option-b-heavy" class="text-[14px] font-bold text-gray-700 text-left flex-1">B 내용 (매우 그렇다)</span>
-                </button>
+                <div class="flex flex-col gap-2 py-2">
+                    <button onclick="handleAnswer(2, 'left')" class="scale-btn">매우 그렇다</button>
+                    <button onclick="handleAnswer(1, 'left')" class="scale-btn text-sm font-medium">약간 그렇다</button>
+                    <button onclick="handleAnswer(1, 'right')" class="scale-btn text-sm font-medium">약간 그렇다</button>
+                    <button onclick="handleAnswer(2, 'right')" class="scale-btn">매우 그렇다</button>
+                </div>
+
+                <div class="scenario-box border-l-4 border-l-gray-300">
+                    <p id="option-b-text" class="text-center text-gray-800 font-bold text-[15px] leading-relaxed"></p>
+                </div>
             </div>
 
             <div class="flex justify-start mt-8 pt-4 border-t border-gray-50">
-                <button id="prev-btn" onclick="goBack()" class="text-gray-400 hover:text-indigo-600 flex items-center gap-1 text-xs font-bold">
+                <button id="prev-btn" onclick="goBack()" class="text-gray-400 hover:text-indigo-600 flex items-center gap-1 text-xs font-bold transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
                     </svg>
@@ -120,7 +117,7 @@
             <h2 id="result-title" class="text-2xl font-bold text-gray-800 mb-8 break-keep px-4">유형 이름</h2>
             <div class="w-10 h-1 bg-indigo-500 mx-auto mb-10 rounded-full"></div>
             <p id="result-desc" class="text-[15px] text-gray-600 leading-[1.8] mb-12 text-left bg-gray-50 p-8 rounded-[2.5rem] border border-white shadow-inner whitespace-pre-wrap"></p>
-            <button onclick="location.reload()" class="w-full bg-indigo-600 text-white py-5 rounded-2xl font-bold hover:bg-indigo-700 shadow-lg active:scale-95">다시 테스트하기</button>
+            <button onclick="location.reload()" class="w-full bg-indigo-600 text-white py-5 rounded-2xl font-bold hover:bg-indigo-700 shadow-lg active:scale-95 transition-all">다시 테스트하기</button>
         </div>
     </div>
 
@@ -189,10 +186,8 @@
             container.classList.add('question-fade');
 
             document.getElementById('scenario-text').innerText = q.q;
-            document.getElementById('option-a-heavy').innerText = q.a + " (매우 그렇다)";
-            document.getElementById('option-a-light').innerText = q.a + " (약간 그렇다)";
-            document.getElementById('option-b-light').innerText = q.b + " (약간 그렇다)";
-            document.getElementById('option-b-heavy').innerText = q.b + " (매우 그렇다)";
+            document.getElementById('option-a-text').innerText = q.a;
+            document.getElementById('option-b-text').innerText = q.b;
 
             document.getElementById('progress-text').innerText = `${currentIndex + 1} / 20`;
             document.getElementById('progress-bar').style.width = `${((currentIndex + 1) / 20) * 100}%`;
