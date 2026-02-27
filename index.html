@@ -72,8 +72,7 @@
             <div class="flex justify-center mb-6"><img id="result-img" src="" class="w-48 h-auto type-img-shadow"></div>
             
             <div id="result-code" class="text-5xl font-black text-indigo-900 mb-2 italic tracking-tighter">TYPE</div>
-            <div id="result-keywords" class="flex justify-center gap-1.5 mb-6 overflow-x-hidden whitespace-nowrap">
-                </div>
+            <div id="result-keywords" class="flex justify-center gap-1.5 mb-6 overflow-x-hidden whitespace-nowrap"></div>
 
             <h2 id="result-title" class="text-2xl font-bold text-gray-800 mb-2 px-4 leading-tight"></h2>
             <p id="result-summary" class="text-indigo-600 font-bold text-[14px] mb-8 px-4 break-keep"></p>
@@ -84,8 +83,8 @@
             </div>
 
             <div class="text-left mb-10 space-y-4">
-                <h4 class="text-lg font-bold text-gray-900 px-2 flex items-center gap-2">🔍 선교 스타일 요약</h4>
-                <div id="category-details" class="space-y-3">
+                <h4 class="text-lg font-bold text-gray-900 px-2 flex items-center gap-2">🔍 선교 스타일 가이드 (전체)</h4>
+                <div id="category-details" class="space-y-6">
                     </div>
             </div>
 
@@ -99,8 +98,8 @@
     </div>
 
     <script>
+        // [질문 데이터 - 동일]
         const rawQuestions = [
-            // [질문 데이터는 이전과 동일 - F/B, W/L, R/T, S/A 순서 20문항]
             { q: "모임에 어색한 정적이 흐를 때,", a: "내가 먼저 아무 말이나 던져 침묵을 깬다.", b: "누군가 말할 때까지 속으로 기다린다.", left: 'F', right: 'B' },
             { q: "지인과 함께 식사를 하러갈 때,", a: "먼저 물컵과 수저를 세팅한다.", b: "조심히 상황을 지켜보며 기다린다.", left: 'F', right: 'B' },
             { q: "팀 프로젝트를 진행할 때,", a: "마이크를 잡고 스피치 하는 발표자", b: "타이밍 맞춰 PPT를 넘겨주는 오퍼레이터", left: 'F', right: 'B' },
@@ -123,16 +122,16 @@
             { q: "마감일이 정해진 사역이나 업무를 할 때,", a: "미리미리 여유 있게 끝내놔야 마음 편히 발 뻗고 잔다.", b: "마감 직전 폭발하는 아드레날린의 엄청난 효율을 믿는다.", left: 'S', right: 'A' }
         ];
 
-        const indicatorInfo = {
-            F: { label: "F 전방현장형", cat: "사역의 위치", sub: "(에너지의 방향)", desc: "현장 최전방에서 직접 소통하고 개척하는 스타일" },
-            B: { label: "B 후방지원형", cat: "사역의 위치", sub: "(에너지의 방향)", desc: "보이지 않는 곳에서 행정과 기도로 든든히 받쳐주는 스타일" },
-            W: { label: "W 타문화열방형", cat: "사역의 무대", sub: "(관심의 대상)", desc: "낯선 문화권과 먼 나라 영혼들에 대한 뜨거운 마음" },
-            L: { label: "L 인근일상형", cat: "사역의 무대", sub: "(관심의 대상)", desc: "내 삶의 터전과 가까운 이웃을 돌보는 생활 밀착형" },
-            R: { label: "R 관계중심형", cat: "접근 방식", sub: "", desc: "사람의 마음과 감정, 나눔을 사역의 최우선으로 선호" },
-            T: { label: "T 과업중심형", cat: "접근 방식", sub: "", desc: "명확한 목표 달성과 효율적인 업무 처리를 중요시함" },
-            S: { label: "S 계획중심형", cat: "상황 대처", sub: "", desc: "철저한 준비와 체계적인 일정을 통해 안정적으로 사역" },
-            A: { label: "A 유연대응형", cat: "상황 대처", sub: "", desc: "변화하는 상황에 순발력 있게 대처하며 자유롭게 사역" }
-        };
+        const allIndicators = [
+            { id: 'F', group: '사역의 위치', sub: '(에너지의 방향)', label: 'F 전방현장형', desc: '현장 최전방에서 직접 소통하고 개척하는 스타일' },
+            { id: 'B', group: '사역의 위치', sub: '(에너지의 방향)', label: 'B 후방지원형', desc: '보이지 않는 곳에서 행정과 기도로 든든히 받쳐주는 스타일' },
+            { id: 'W', group: '사역의 무대', sub: '(관심의 대상)', label: 'W 타문화열방형', desc: '낯선 문화권과 먼 나라 영혼들에 대한 뜨거운 마음' },
+            { id: 'L', group: '사역의 무대', sub: '(관심의 대상)', label: 'L 인근일상형', desc: '내 삶의 터전과 가까운 이웃을 돌보는 생활 밀착형' },
+            { id: 'R', group: '접근 방식', sub: '', label: 'R 관계중심형', desc: '사람의 마음과 감정, 나눔을 사역의 최우선으로 선호' },
+            { id: 'T', group: '접근 방식', sub: '', label: 'T 과업중심형', desc: '명확한 목표 달성과 효율적인 업무 처리를 중요시함' },
+            { id: 'S', group: '상황 대처', sub: '', label: 'S 계획중심형', desc: '철저한 준비와 체계적인 일정을 통해 안정적으로 사역' },
+            { id: 'A', group: '상황 대처', sub: '', label: 'A 유연대응형', desc: '변화하는 상황에 순발력 있게 대처하며 자유롭게 사역' }
+        ];
 
         const results = {
             "FWRS": { title: "준비된 글로벌 프론티어", summary: "선교지 최전방에서 현지인과 깊게 교제하며, 철저하게 계획된 일정대로 전도하는 빈틈없는 개척자.", desc: "언어와 문화를 미리 꼼꼼히 공부해가서 현지인들에게 깊은 감동을 줍니다. 당신의 철저한 준비 덕분에 팀원들은 안전함을 느끼고, 현지인들은 존중받는 느낌을 받습니다.", img: 1, best: "BWTS (파워 스케줄 네비게이터)", bestReason: "당신이 앞에서 거침없이 복음을 전할 때, 뒤에서 항공권과 재정을 오차 없이 세팅해 주는 최고의 파트너입니다.", sub: "FWTA (위기탈출 특공대)", subReason: "당신의 완벽한 계획이 현지 사정으로 틀어졌을 때, 텐션을 잃지 않고 순발력 있게 위기를 모면해 줍니다." },
@@ -148,7 +147,7 @@
             "BWTS": { title: "파워 스케쥴 선교 네비게이터", summary: "항공권, 재정 관리, 사역 타임테이블 등 선교의 뼈대를 오차 없이 완벽하게 세워 팀을 이끄는 보이지 않는 브레인.", desc: "이동 동선, 숙소 예약, 식사 예산까지 엑셀로 정리하여 사역이 물 흐르듯 진행되게 만듭니다. 당신의 보이지 않는 수고 덕분에 팀원들은 오직 사역과 예배에만 집중할 수 있습니다.", img: 11, best: "FWRS (준비된 글로벌 프론티어)", bestReason: "당신이 짠 완벽한 타임테이블과 예산안을 가장 잘 이해하고, 그 판 위에서 최고의 효율로 사역을 펼치는 리더입니다.", sub: "BWRA (국경 초월 힐러)", subReason: "행정과 일정(T)에 치여 스트레스받을 때, 따뜻한 위로 한마디와 간식(R)을 건네주는 힐링 파트너입니다." },
             "BWTA": { title: "선교지 만능 맥가이버", summary: "무더운 날 짐을 나르거나 식사를 챙기는 등, 선교 현장에서 발생하는 온갖 돌발적인 궂은일을 말없이 척척 해결하는 기둥.", desc: "갑작스러운 짐 이동이나 설거지거리 등 남들이 꺼리는 일을 불평 없이 묵묵히 처리합니다. 화려한 조명은 없지만, 하나님은 땀 흘리는 당신의 등을 가장 아름답게 보십니다.", img: 12, best: "FWTS (열방의 홀리 버스커)", bestReason: "당신이 세팅한 음향 장비와 고쳐놓은 소품들을 활용해 무대 위에서 최고의 퍼포먼스를 내며 보람을 느끼게 해줍니다.", sub: "FWRS (준비된 글로벌 프론티어)", subReason: "눈앞의 고장 난 것을 즉각 고치는 데 특화된 당신에게, 선교의 큰 그림과 장기적인 비전을 제시해 줍니다." },
             "BLRS": { title: "비밀 중보기도 요원", summary: "기도 노트에 지체들의 이름을 빼곡히 적어두고, 치밀하고 구체적으로 영적 전쟁의 최후방을 지키는 기도의 용사.", desc: "매일 정해진 시간에 공동체와 나라를 위해 무릎 꿇으며, 한번 들은 기도 제목은 절대 잊지 않고 끝까지 책임집니다. 당신은 우리 공동체를 영적으로 지탱하는 가장 강력한 기둥입니다.", img: 13, best: "FLTS (공동체 하드캐리 리더)", bestReason: "당신의 강력한 기도의 후원을 받아, 실제 공동체 안에서 눈에 보이는 굵직한 사역들을 돌파해 내는 행동 대장입니다.", sub: "FLTA (순발력 만렙 사역자)", subReason: "조용히 골방을 지키는 당신에게, 가끔은 활동적이고 유쾌한 교제의 자리로 이끌어 활기를 불어넣어 줍니다." },
-            "BLRA": { title: "공동체 인간 핫팩", summary: "공동체 모임에서 어색해하거나 소외된 새가족 곁에 유연하게 다가가, 조용히 말을 건네며 마음을 녹여주는 따뜻한 난로.", desc: "혼자 있는 지체에게 슥 다가가 부담스럽지 않게 말을 걸고, 그들의 이야기를 경청해 줍니다. 당신 곁에 있으면 누구나 '내가 여기 소속되어 있구나' 하는 안정감을 느낍니다.", img: 14, best: "FLRA (동네방네 빛과 소금)", bestReason: "길 잃은 양들을 교회로 계속 데려오면, 당신의 따뜻함으로 그들이 공동체에 뿌리내리게 하는 환상의 릴레이 전도 조합입니다.", sub: "BLTS (디테일 깎는 장인)", subReason: "사람을 챙기느라 놓치기 쉬운 행정적인 부분(회비 걷기, 출석부 정리 등)을 옆에서 깔끔하게 마무리해 줍니다." },
+            "BLRA": { title: "공동체 인간 핫팩", summary: "공동체 모임에서 어색해하거나 소외된 새가족 곁에 유연하게 다가가, 조용히 말을 건네며 마음을 녹여주는 따뜻한 난로.", desc: "혼자 있는 지체에게 슥 다가가 부담스럽지 않게 말을 걸고, 그들의 이야기를 경청해 줍니다. 당신 곁에 있으면 누구나 '내가 여기 소속되어 있구나' 하는 안정감을 느꼈니다.", img: 14, best: "FLRA (동네방네 빛과 소금)", bestReason: "길 잃은 양들을 교회로 계속 데려오면, 당신의 따뜻함으로 그들이 공동체에 뿌리내리게 하는 환상의 릴레이 전도 조합입니다.", sub: "BLTS (디테일 깎는 장인)", subReason: "사람을 챙기느라 놓치기 쉬운 행정적인 부분(회비 걷기, 출석부 정리 등)을 옆에서 깔끔하게 마무리해 줍니다." },
             "BLTS": { title: "디테일 깎는 장인", summary: "청년부 행사 때 PPT, 영상, 회계 등 가장 손이 많이 가고 티 안 나는 사역을 완벽하게 준비하는 보이지 않는 손.", desc: "예배 PPT, 주보 디자인, 회계 정산 등 꼼꼼함이 필요한 영역에서 빈틈없는 실력을 발휘합니다. 티 내지 않고 묵묵히 완성도를 높이는 당신의 섬김이 예배의 품격을 만듭니다.", img: 15, best: "FLRS (일상의 전략적 멘토)", bestReason: "당신이 기획하고 깎아낸 정교한 예배 세팅이나 소그룹 자료를 가지고, 영혼들을 먹이고 양육하는 데 알차게 사용해 줍니다.", sub: "BLRA (공동체 인간 핫팩)", subReason: "화면 속 픽셀이나 엑셀 수식(T)에 갇혀 있을 때, \"수고가 많다\"며 커피 한 잔(R)을 건네주는 힐링 파트너입니다." },
             "BLTA": { title: "교회의 숨은 천사", summary: "일손이 부족하거나 펑크 난 자리가 생기면 제일 먼저 달려와 그 자리를 기꺼이 메워주는, 묵묵하지만 가장 든든한 동역자.", desc: "행사 당일 일손이 부족한 곳이 보이면 누가 시키지 않아도 조용히 가서 그 구멍을 메웁니다. 이름 없이 빛도 없이 섬기는 당신이야말로 하나님 나라의 진정한 영웅입니다.", img: 16, best: "FLTA (순발력 만렙 사역자)", bestReason: "당신이 빈자리를 메우고 상황을 정리해 주는 덕분에, 돌발 상황에서도 자유롭게 끼를 발휘하며 판을 깔 수 있는 콤비입니다.", sub: "FLTS (공동체 하드캐리 리더)", subReason: "묵묵히 시키는 일을 잘 해내는 당신에게, \"이번엔 이 방향으로 가자!\"며 명확한 목표와 동기를 부여해 줍니다." }
         };
@@ -211,43 +210,65 @@
             document.getElementById('result-summary').innerText = res.summary;
             document.getElementById('result-desc').innerText = res.desc;
 
-            // 키워드 한 줄 배치 (F 전방현장형 등)
+            // 키워드 한 줄 배치
             const keywordDiv = document.getElementById('result-keywords');
             keywordDiv.innerHTML = '';
             mbti.split('').forEach(char => {
+                const info = allIndicators.find(i => i.id === char);
                 const span = document.createElement('span');
-                span.className = "text-[10px] sm:text-xs font-bold text-indigo-500 bg-indigo-50 px-2 py-1 rounded-md border border-indigo-100";
-                span.innerText = indicatorInfo[char].label;
+                span.className = "text-[10px] font-bold text-indigo-500 bg-indigo-50 px-2 py-1 rounded-md border border-indigo-100";
+                span.innerText = info.label;
                 keywordDiv.appendChild(span);
             });
 
-            // 4대 카테고리 상세 설명 생성
+            // 스타일 가이드 (8개 전체 지표 노출)
             const catDiv = document.getElementById('category-details');
             catDiv.innerHTML = '';
-            mbti.split('').forEach((char, idx) => {
-                const info = indicatorInfo[char];
-                catDiv.innerHTML += `
-                    <div class="flex items-start gap-3 bg-white p-3 rounded-xl border border-gray-100">
-                        <span class="text-indigo-600 font-black text-lg w-6">${idx + 1}</span>
-                        <div>
-                            <p class="text-[12px] font-bold text-gray-400 leading-none mb-1">${info.cat} <span class="font-normal text-[10px]">${info.sub}</span></p>
-                            <p class="text-[14px] font-bold text-gray-800">${info.label}</p>
-                            <p class="text-[12px] text-gray-500 mt-0.5">${info.desc}</p>
+            
+            // 카테고리별로 그룹화하여 출력
+            const groups = ["사역의 위치", "사역의 무대", "접근 방식", "상황 대처"];
+            groups.forEach((groupName, gIdx) => {
+                const groupContainer = document.createElement('div');
+                groupContainer.className = "space-y-2";
+                
+                const groupTitle = document.createElement('p');
+                const subTitle = allIndicators.find(i => i.group === groupName).sub;
+                groupTitle.className = "text-[11px] font-black text-gray-400 uppercase tracking-widest pl-1 mb-2";
+                groupTitle.innerHTML = `${gIdx+1}. ${groupName} <span class="font-normal text-[10px]">${subTitle}</span>`;
+                groupContainer.appendChild(groupTitle);
+
+                const groupIndicators = allIndicators.filter(i => i.group === groupName);
+                groupIndicators.forEach(info => {
+                    const isSelected = mbti.includes(info.id);
+                    const item = document.createElement('div');
+                    item.className = `flex items-start gap-3 p-3 rounded-2xl border transition-all ${isSelected ? 'bg-indigo-600 border-indigo-600 shadow-md' : 'bg-white border-gray-100'}`;
+                    
+                    item.innerHTML = `
+                        <div class="mt-1 flex-shrink-0">
+                            ${isSelected ? 
+                                '<svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>' : 
+                                '<div class="w-4 h-4 rounded-full border-2 border-gray-200"></div>'}
                         </div>
-                    </div>
-                `;
+                        <div>
+                            <p class="text-[14px] font-bold ${isSelected ? 'text-white' : 'text-gray-800'}">${info.label}</p>
+                            <p class="text-[12px] ${isSelected ? 'text-indigo-100' : 'text-gray-500'} mt-0.5">${info.desc}</p>
+                        </div>
+                    `;
+                    groupContainer.appendChild(item);
+                });
+                catDiv.appendChild(groupContainer);
             });
 
             // 동역자 리스트
             const compDiv = document.getElementById('companion-list');
             compDiv.innerHTML = `
                 <div class="bg-indigo-50 p-6 rounded-[2rem] border border-indigo-100 relative shadow-sm">
-                    <span class="absolute -top-3 left-6 bg-indigo-500 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-tighter">Best Combo</span>
+                    <span class="absolute -top-3 left-6 bg-indigo-500 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase">Best Combo</span>
                     <p class="text-indigo-900 font-black text-base mb-2">🥇 ${res.best}</p>
                     <p class="text-indigo-700 text-[13px] leading-relaxed break-keep">${res.bestReason}</p>
                 </div>
                 <div class="bg-gray-50 p-6 rounded-[2rem] border border-gray-100 relative shadow-sm">
-                    <span class="absolute -top-3 left-6 bg-gray-500 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-tighter">Sub Partner</span>
+                    <span class="absolute -top-3 left-6 bg-gray-500 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase">Sub Partner</span>
                     <p class="text-gray-900 font-black text-base mb-2">🥈 ${res.sub}</p>
                     <p class="text-gray-600 text-[13px] leading-relaxed break-keep">${res.subReason}</p>
                 </div>
