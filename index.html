@@ -20,6 +20,12 @@
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-4">
 
+    <button onclick="toggleFullScreen()" class="fixed top-4 right-4 z-50 bg-white/80 backdrop-blur-sm p-3 rounded-2xl shadow-sm border border-gray-100 active:scale-90 transition-all">
+        <svg id="fs-icon" class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
+        </svg>
+    </button>
+
     <div id="start-screen" class="max-w-md w-full text-center fade-in">
         <div class="mb-6 text-6xl">🧬</div>
         <h1 class="text-3xl font-black text-gray-900 mb-4 tracking-tight">선교 적성 검사</h1>
@@ -84,8 +90,7 @@
 
             <div class="text-left mb-10 space-y-4">
                 <h4 class="text-lg font-bold text-gray-900 px-2 flex items-center gap-2">🔍 선교 스타일 가이드 (전체)</h4>
-                <div id="category-details" class="space-y-6">
-                    </div>
+                <div id="category-details" class="space-y-6"></div>
             </div>
 
             <div class="text-left mb-12 px-2">
@@ -98,7 +103,19 @@
     </div>
 
     <script>
-        // [질문 데이터 - 동일]
+        // 전체화면 토글 함수
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    alert(`전체화면 모드를 시작할 수 없습니다: ${err.message}`);
+                });
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
         const rawQuestions = [
             { q: "모임에 어색한 정적이 흐를 때,", a: "내가 먼저 아무 말이나 던져 침묵을 깬다.", b: "누군가 말할 때까지 속으로 기다린다.", left: 'F', right: 'B' },
             { q: "지인과 함께 식사를 하러갈 때,", a: "먼저 물컵과 수저를 세팅한다.", b: "조심히 상황을 지켜보며 기다린다.", left: 'F', right: 'B' },
@@ -210,7 +227,6 @@
             document.getElementById('result-summary').innerText = res.summary;
             document.getElementById('result-desc').innerText = res.desc;
 
-            // 키워드 한 줄 배치
             const keywordDiv = document.getElementById('result-keywords');
             keywordDiv.innerHTML = '';
             mbti.split('').forEach(char => {
@@ -221,20 +237,17 @@
                 keywordDiv.appendChild(span);
             });
 
-            // 스타일 가이드 (8개 전체 지표 노출)
             const catDiv = document.getElementById('category-details');
             catDiv.innerHTML = '';
             
-            // 카테고리별로 그룹화하여 출력
             const groups = ["사역의 위치", "사역의 무대", "접근 방식", "상황 대처"];
             groups.forEach((groupName, gIdx) => {
                 const groupContainer = document.createElement('div');
                 groupContainer.className = "space-y-2";
                 
                 const groupTitle = document.createElement('p');
-                const subTitle = allIndicators.find(i => i.group === groupName).sub;
                 groupTitle.className = "text-[11px] font-black text-gray-400 uppercase tracking-widest pl-1 mb-2";
-                groupTitle.innerHTML = `${gIdx+1}. ${groupName} <span class="font-normal text-[10px]">${subTitle}</span>`;
+                groupTitle.innerHTML = `${gIdx+1}. ${groupName}`;
                 groupContainer.appendChild(groupTitle);
 
                 const groupIndicators = allIndicators.filter(i => i.group === groupName);
@@ -259,7 +272,6 @@
                 catDiv.appendChild(groupContainer);
             });
 
-            // 동역자 리스트
             const compDiv = document.getElementById('companion-list');
             compDiv.innerHTML = `
                 <div class="bg-indigo-50 p-6 rounded-[2rem] border border-indigo-100 relative shadow-sm">
