@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>선교 적성 검사 (Mission MBTI)</title>
+    <title>선교 유형 검사 (Mission MBTI)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
@@ -18,9 +18,9 @@
         .type-img-shadow { filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.1)); }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-center p-4">
+<body class="min-h-screen flex flex-col items-center justify-center p-4 relative">
 
-    <button onclick="toggleFullScreen()" class="fixed top-4 right-4 z-50 bg-white/80 backdrop-blur-sm p-3 rounded-2xl shadow-sm border border-gray-100 active:scale-90 transition-all">
+    <button onclick="toggleFullScreen()" class="fixed top-4 right-4 z-50 bg-white/80 backdrop-blur-sm p-3 rounded-2xl shadow-sm border border-gray-100 active:scale-90 transition-all hover:bg-white">
         <svg id="fs-icon" class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
         </svg>
@@ -28,9 +28,9 @@
 
     <div id="start-screen" class="max-w-md w-full text-center fade-in">
         <div class="mb-6 text-6xl">🧬</div>
-        <h1 class="text-3xl font-black text-gray-900 mb-4 tracking-tight">선교 적성 검사</h1>
+        <h1 class="text-3xl font-black text-gray-900 mb-4 tracking-tight">선교 유형 검사</h1>
         <p class="text-gray-500 mb-8 leading-relaxed px-6 text-sm">나의 선교적 성향을 확인하고<br>나와 가장 잘 맞는 동역자를 찾아보세요.</p>
-        <button onclick="startTest()" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold text-lg shadow-xl active:scale-95 transition-all">검사 시작하기</button>
+        <button onclick="startTest()" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold text-lg shadow-xl active:scale-95 hover:bg-indigo-700 transition-all">검사 시작하기</button>
     </div>
 
     <div id="question-screen" class="max-w-md w-full hidden">
@@ -73,9 +73,9 @@
     </div>
 
     <div id="result-screen" class="max-w-md w-full hidden fade-in py-6">
-        <div class="bg-white rounded-[3rem] p-8 shadow-2xl border border-indigo-50 text-center">
+        <div class="bg-white rounded-[3rem] p-8 shadow-2xl border border-indigo-50 text-center relative">
             <h3 class="text-indigo-500 font-bold mb-6 uppercase tracking-[0.3em] text-[10px]">Your Mission Type</h3>
-            <div class="flex justify-center mb-6"><img id="result-img" src="" class="w-48 h-auto type-img-shadow"></div>
+            <div class="flex justify-center mb-6"><img id="result-img" src="" alt="Type Image" class="w-48 h-auto type-img-shadow"></div>
             
             <div id="result-code" class="text-5xl font-black text-indigo-900 mb-2 italic tracking-tighter">TYPE</div>
             <div id="result-keywords" class="flex justify-center gap-1.5 mb-6 overflow-x-hidden whitespace-nowrap"></div>
@@ -98,7 +98,26 @@
                 <div id="companion-list" class="space-y-6"></div>
             </div>
 
-            <button onclick="location.reload()" class="w-full bg-gray-100 text-gray-500 py-4 rounded-2xl font-bold hover:bg-gray-200 transition-all">다시 테스트하기</button>
+            <div id="all-types-section" class="hidden md:block mb-4">
+                <button onclick="toggleAllTypes()" class="w-full bg-indigo-50 text-indigo-700 py-4 rounded-2xl font-bold hover:bg-indigo-100 transition-all border border-indigo-100 shadow-sm">
+                    전체 16가지 유형 한눈에 보기 (PC 전용)
+                </button>
+            </div>
+
+            <button onclick="location.reload()" class="w-full bg-gray-100 text-gray-600 py-4 rounded-2xl font-bold hover:bg-gray-200 transition-all">다시 테스트하기</button>
+        </div>
+    </div>
+
+    <div id="all-types-modal" class="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-6 opacity-0 transition-opacity duration-300">
+        <div class="bg-white w-full max-w-6xl max-h-[90vh] rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden transform scale-95 transition-transform duration-300" id="modal-content">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50 flex-shrink-0">
+                <h2 class="text-2xl font-black text-gray-900 tracking-tight">선교 DNA 16가지 전체 유형</h2>
+                <button onclick="toggleAllTypes()" class="text-gray-400 hover:text-gray-700 p-2 rounded-full hover:bg-gray-200 transition-colors">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div class="overflow-y-auto p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 bg-gray-50/50" id="all-types-grid">
+                </div>
         </div>
     </div>
 
@@ -107,7 +126,7 @@
         function toggleFullScreen() {
             if (!document.fullscreenElement) {
                 document.documentElement.requestFullscreen().catch(err => {
-                    alert(`전체화면 모드를 시작할 수 없습니다: ${err.message}`);
+                    console.warn(`전체화면 모드를 시작할 수 없습니다: ${err.message}`);
                 });
             } else {
                 if (document.exitFullscreen) {
@@ -116,6 +135,54 @@
             }
         }
 
+        // 전체 유형 모달 토글 및 렌더링 함수
+        function toggleAllTypes() {
+            const modal = document.getElementById('all-types-modal');
+            const grid = document.getElementById('all-types-grid');
+            const modalContent = document.getElementById('modal-content');
+            
+            if (modal.classList.contains('hidden')) {
+                // 그리드 내용이 비어있으면 1회 렌더링
+                if (grid.innerHTML.trim() === "") {
+                    Object.entries(results).forEach(([code, data]) => {
+                        const card = document.createElement('div');
+                        card.className = "bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md hover:border-indigo-300 hover:-translate-y-1 transition-all cursor-default flex flex-col h-full";
+                        card.innerHTML = `
+                            <div class="text-indigo-500 font-black text-sm mb-1 tracking-widest uppercase">${code}</div>
+                            <div class="font-bold text-gray-900 text-lg mb-2 leading-tight">${data.title}</div>
+                            <div class="text-gray-600 text-[13px] leading-relaxed break-keep flex-grow">${data.summary}</div>
+                        `;
+                        grid.appendChild(card);
+                    });
+                }
+                // 모달 열기 (애니메이션 적용)
+                modal.classList.remove('hidden');
+                // 약간의 딜레이를 주어 transition이 작동하도록 함
+                setTimeout(() => {
+                    modal.classList.remove('opacity-0');
+                    modalContent.classList.remove('scale-95');
+                }, 10);
+            } else {
+                // 모달 닫기 (애니메이션 적용)
+                modal.classList.add('opacity-0');
+                modalContent.classList.add('scale-95');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                }, 300); // transition duration과 동일하게 맞춤
+            }
+        }
+
+        // ESC 키 입력 시 모달 닫기 지원
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const modal = document.getElementById('all-types-modal');
+                if (!modal.classList.contains('hidden')) {
+                    toggleAllTypes();
+                }
+            }
+        });
+
+        // 질문 데이터
         const rawQuestions = [
             { q: "모임에 어색한 정적이 흐를 때,", a: "내가 먼저 아무 말이나 던져 침묵을 깬다.", b: "누군가 말할 때까지 속으로 기다린다.", left: 'F', right: 'B' },
             { q: "지인과 함께 식사를 하러갈 때,", a: "먼저 물컵과 수저를 세팅한다.", b: "조심히 상황을 지켜보며 기다린다.", left: 'F', right: 'B' },
@@ -139,6 +206,7 @@
             { q: "마감일이 정해진 사역이나 업무를 할 때,", a: "미리미리 여유 있게 끝내놔야 마음 편히 발 뻗고 잔다.", b: "마감 직전 폭발하는 아드레날린의 엄청난 효율을 믿는다.", left: 'S', right: 'A' }
         ];
 
+        // 지표 설명
         const allIndicators = [
             { id: 'F', group: '사역의 위치', sub: '', label: 'F 전방현장형', desc: '현장 최전방에서 직접 소통하고 개척하는 스타일' },
             { id: 'B', group: '사역의 위치', sub: '', label: 'B 후방지원형', desc: '보이지 않는 곳에서 행정과 기도로 든든히 받쳐주는 스타일' },
@@ -150,6 +218,7 @@
             { id: 'A', group: '상황 대처', sub: '', label: 'A 유연대응형', desc: '변화하는 상황에 순발력 있게 대처하며 자유롭게 사역' }
         ];
 
+        // 16가지 결과 데이터
         const results = {
             "FWRS": { title: "준비된 글로벌 프론티어", summary: "선교지 최전방에서 현지인과 깊게 교제하며, 철저하게 계획된 일정대로 전도하는 빈틈없는 개척자.", desc: "언어와 문화를 미리 꼼꼼히 공부해가서 현지인들에게 깊은 감동을 줍니다. 당신의 철저한 준비 덕분에 팀원들은 안전함을 느끼고, 현지인들은 존중받는 느낌을 받습니다.", img: 1, best: "BWTS (파워 스케줄 네비게이터)", bestReason: "당신이 앞에서 거침없이 복음을 전할 때, 뒤에서 항공권과 재정을 오차 없이 세팅해 주는 최고의 파트너입니다.", sub: "FWTA (위기탈출 특공대)", subReason: "당신의 완벽한 계획이 현지 사정으로 틀어졌을 때, 텐션을 잃지 않고 순발력 있게 위기를 모면해 줍니다." },
             "FWRA": { title: "성령충만 글로벌 인싸", summary: "낯선 타문화권에서도 바디랭귀지로 현지인과 5분 만에 베프가 되는 자유로운 영혼의 소유자.", desc: "계획에 없던 만남에서도 하나님이 예비하신 영혼을 기가 막히게 찾아냅니다. 당신의 환한 미소와 친화력은 닫혀 있던 선교지의 문을 가장 먼저 여는 강력한 열쇠입니다.", img: 2, best: "BWRS (선교지 마더 테레사)", bestReason: "당신이 길거리에서 엄청난 친화력으로 영혼들을 데려오면, 뒤에서 따뜻한 밥과 약을 챙겨주며 정착시킵니다.", sub: "BWTS (파워 스케줄 네비게이터)", subReason: "즉흥적이고 자유로운 당신이 사역의 큰 틀을 벗어나지 않도록 든든한 나침반이 되어 줍니다." },
@@ -189,7 +258,7 @@
             document.getElementById('progress-text').innerText = `${currentIndex + 1} / 20`;
             document.getElementById('progress-bar').style.width = `${((currentIndex + 1) / 20) * 100}%`;
             document.getElementById('prev-btn').style.visibility = currentIndex === 0 ? 'hidden' : 'visible';
-            window.scrollTo(0,0);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function handleAnswer(pts, side) {
@@ -218,28 +287,31 @@
         function showResult() {
             const mbti = (scores.F >= scores.B ? "F" : "B") + (scores.W >= scores.L ? "W" : "L") + (scores.R >= scores.T ? "R" : "T") + (scores.S >= scores.A ? "S" : "A");
             const res = results[mbti];
+            
             document.getElementById('loading-screen').classList.add('hidden');
             document.getElementById('result-screen').classList.remove('hidden');
             
+            // 이미지 번호 매핑 (결과 객체의 img 프로퍼티 사용)
             document.getElementById('result-img').src = `./${res.img}.PNG`;
             document.getElementById('result-code').innerText = mbti;
             document.getElementById('result-title').innerText = res.title;
             document.getElementById('result-summary').innerText = res.summary;
             document.getElementById('result-desc').innerText = res.desc;
 
+            // 키워드 배지
             const keywordDiv = document.getElementById('result-keywords');
             keywordDiv.innerHTML = '';
             mbti.split('').forEach(char => {
                 const info = allIndicators.find(i => i.id === char);
                 const span = document.createElement('span');
-                span.className = "text-[10px] font-bold text-indigo-500 bg-indigo-50 px-2 py-1 rounded-md border border-indigo-100";
+                span.className = "text-[10px] font-bold text-indigo-500 bg-indigo-50 px-2 py-1 rounded-md border border-indigo-100 shadow-sm";
                 span.innerText = info.label;
                 keywordDiv.appendChild(span);
             });
 
+            // 상세 지표 설명 구성
             const catDiv = document.getElementById('category-details');
             catDiv.innerHTML = '';
-            
             const groups = ["사역의 위치", "사역의 무대", "접근 방식", "상황 대처"];
             groups.forEach((groupName, gIdx) => {
                 const groupContainer = document.createElement('div');
@@ -272,20 +344,21 @@
                 catDiv.appendChild(groupContainer);
             });
 
+            // 동역자 정보 구성
             const compDiv = document.getElementById('companion-list');
             compDiv.innerHTML = `
-                <div class="bg-indigo-50 p-6 rounded-[2rem] border border-indigo-100 relative shadow-sm">
-                    <span class="absolute -top-3 left-6 bg-indigo-500 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase">Best Combo</span>
+                <div class="bg-indigo-50 p-6 rounded-[2rem] border border-indigo-100 relative shadow-sm hover:shadow-md transition-shadow">
+                    <span class="absolute -top-3 left-6 bg-indigo-500 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider">Best Combo</span>
                     <p class="text-indigo-900 font-black text-base mb-2">🥇 ${res.best}</p>
                     <p class="text-indigo-700 text-[13px] leading-relaxed break-keep">${res.bestReason}</p>
                 </div>
-                <div class="bg-gray-50 p-6 rounded-[2rem] border border-gray-100 relative shadow-sm">
-                    <span class="absolute -top-3 left-6 bg-gray-500 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase">Sub Partner</span>
+                <div class="bg-gray-50 p-6 rounded-[2rem] border border-gray-200 relative shadow-sm hover:shadow-md transition-shadow">
+                    <span class="absolute -top-3 left-6 bg-gray-500 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider">Sub Partner</span>
                     <p class="text-gray-900 font-black text-base mb-2">🥈 ${res.sub}</p>
                     <p class="text-gray-600 text-[13px] leading-relaxed break-keep">${res.subReason}</p>
                 </div>
             `;
-            window.scrollTo(0,0);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     </script>
 </body>
